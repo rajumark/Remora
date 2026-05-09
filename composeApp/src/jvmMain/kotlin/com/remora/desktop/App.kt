@@ -61,10 +61,6 @@ fun App(
     var isSidebarVisible by remember { mutableStateOf(true) }
     var showPreferences by remember { mutableStateOf(false) }
 
-    if (showPreferences) {
-        PreferencePage(onDismissRequest = { showPreferences = false })
-    }
-
     LaunchedEffect(Unit) {
         // Initialize ADB once at startup
         adbManager.initializeAdb()
@@ -76,6 +72,10 @@ fun App(
     }
     
     MaterialTheme(colorScheme = colorScheme) {
+        if (showPreferences) {
+            PreferencePage(onDismissRequest = { showPreferences = false })
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
