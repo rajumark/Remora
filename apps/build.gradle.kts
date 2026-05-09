@@ -10,6 +10,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":adb"))
+            implementation(project(":device"))
             implementation(libs.koin.compose)
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -21,6 +22,6 @@ kotlin {
 }
 
 compose.resources {
-    packageOfResClass = "com.remora.device"
+    packageOfResClass = "com.remora.apps"
     publicResClass = true
 }

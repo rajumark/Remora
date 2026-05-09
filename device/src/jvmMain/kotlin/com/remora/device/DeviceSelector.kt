@@ -10,17 +10,20 @@ import org.jetbrains.compose.resources.painterResource
 
 import com.remora.device.Res
 
+import org.koin.compose.koinInject
+
 /**
  * A self-contained UI component for selecting connected Android devices.
  * Handles its own dropdown state and interacts with [DeviceManager] for data.
  */
 @Composable
 fun DeviceSelector(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    deviceManager: DeviceManager = koinInject()
 ) {
     var showDeviceDropdown by remember { mutableStateOf(false) }
-    val devices = DeviceManager.connectedDevices
-    val selectedDevice = DeviceManager.selectedDevice
+    val devices = deviceManager.connectedDevices
+    val selectedDevice = deviceManager.selectedDevice
 
     Box(modifier = modifier) {
         TextButton(
@@ -73,7 +76,7 @@ fun DeviceSelector(
                         )
                     },
                     onClick = {
-                        DeviceManager.selectedDevice = deviceId
+                        deviceManager.selectedDevice = deviceId
                         showDeviceDropdown = false
                     },
                     leadingIcon = {

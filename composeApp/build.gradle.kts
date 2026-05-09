@@ -14,6 +14,13 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":adb"))
             implementation(project(":device"))
+            implementation(project(":apps"))
+            implementation(project(":settings"))
+            implementation(project(":design"))
+            implementation(project(":terminal"))
+            implementation(project(":help"))
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)

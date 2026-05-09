@@ -35,3 +35,8 @@ plugins {
 include(":composeApp")
 include(":adb")
 include(":device")
+include(":apps")
+include(":settings")
+include(":design")
+include(":terminal")
+include(":help")

@@ -28,14 +28,14 @@ data class NavigationItem(
 
 private val navigationItems = listOf(
     NavigationItem(
-        destination = "Dashboard",
-        label = "Dashboard",
-        iconResource = Res.drawable.ic_dashboard
+        destination = "Apps",
+        label = "Apps",
+        iconResource = Res.drawable.ic_profile
     ),
     NavigationItem(
-        destination = "Settings",
-        label = "Settings",
-        iconResource = Res.drawable.ic_settings
+        destination = "Terminal",
+        label = "Terminal",
+        iconResource = Res.drawable.ic_dashboard
     ),
     NavigationItem(
         destination = "Design",
@@ -43,9 +43,9 @@ private val navigationItems = listOf(
         iconResource = Res.drawable.ic_design
     ),
     NavigationItem(
-        destination = "Apps",
-        label = "Apps",
-        iconResource = Res.drawable.ic_profile
+        destination = "Settings",
+        label = "Settings",
+        iconResource = Res.drawable.ic_settings
     ),
     NavigationItem(
         destination = "Help",
@@ -56,7 +56,7 @@ private val navigationItems = listOf(
 @Composable
 fun AppNavigationDrawer(
     modifier: Modifier = Modifier,
-    selectedDestination: String = "Dashboard",
+    selectedDestination: String = "Apps",
     onNavigationItemClick: (String) -> Unit = {}
 ) {
     Column(

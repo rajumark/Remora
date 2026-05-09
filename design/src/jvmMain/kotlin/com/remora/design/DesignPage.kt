@@ -1,4 +1,4 @@
-package com.remora.desktop
+package com.remora.design
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import com.remora.adb.AdbManager
+import org.koin.compose.koinInject
 
 @Composable
 fun DesignPage() {
@@ -351,20 +352,22 @@ fun ComponentsTab() {
 }
 
 @Composable
-fun DebugTab() {
+fun DebugTab(
+    adbManager: AdbManager = koinInject()
+) {
     var adbPath by remember { mutableStateOf("Loading...") }
     var adbVersion by remember { mutableStateOf("Loading...") }
 
     LaunchedEffect(Unit) {
-        AdbManager.initializeAdb().onSuccess { path ->
-            val platform = AdbManager.getCurrentPlatform()
+        adbManager.initializeAdb().onSuccess { path ->
+            val platform = adbManager.getCurrentPlatform()
             val executable = if (platform == "windows") "platform-tools/adb.exe" else "platform-tools/adb"
             adbPath = java.io.File(path, executable).absolutePath
         }.onFailure {
             adbPath = "Error: ${it.message}"
         }
 
-        AdbManager.getAdbVersion().onSuccess {
+        adbManager.getAdbVersion().onSuccess {
             adbVersion = it
         }.onFailure {
             adbVersion = "Error: ${it.message}"

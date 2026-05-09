@@ -1,4 +1,4 @@
-package com.remora.desktop
+package com.remora.help
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

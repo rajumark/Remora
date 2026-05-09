@@ -1,4 +1,4 @@
-package com.remora.desktop
+package com.remora.apps
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -7,14 +7,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import com.remora.adb.AdbManager
 import com.remora.device.DeviceManager
 import com.remora.device.DeviceResources
 
 @Composable
-fun AppsPage() {
-    val adbPath = AdbManager.adbPath
-    val selectedDevice = DeviceManager.selectedDevice
+fun AppsPage(
+    adbManager: AdbManager = koinInject(),
+    deviceManager: DeviceManager = koinInject()
+) {
+    val adbPath = adbManager.adbPath
+    val selectedDevice = deviceManager.selectedDevice
 
     Column(
         modifier = Modifier

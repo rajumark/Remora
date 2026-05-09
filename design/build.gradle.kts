@@ -21,6 +21,6 @@ kotlin {
 }
 
 compose.resources {
-    packageOfResClass = "com.remora.device"
+    packageOfResClass = "com.remora.design"
     publicResClass = true
 }

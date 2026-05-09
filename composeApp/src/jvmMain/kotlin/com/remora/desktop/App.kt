@@ -26,19 +26,29 @@ import remora.composeapp.generated.resources.compose_multiplatform
 
 import com.remora.adb.AdbManager
 import com.remora.device.DeviceManager
+import com.remora.apps.AppsPage
+import com.remora.settings.SettingsPage
+import com.remora.design.DesignPage
+import com.remora.help.HelpPage
+import com.remora.terminal.TerminalPage
+
+import org.koin.compose.koinInject
 
 @Composable
 @Preview
-fun App() {
-    var selectedDestination by remember { mutableStateOf("Dashboard") }
+fun App(
+    adbManager: AdbManager = koinInject(),
+    deviceManager: DeviceManager = koinInject()
+) {
+    var selectedDestination by remember { mutableStateOf("Apps") }
     var isSidebarVisible by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         // Initialize ADB once at startup
-        AdbManager.initializeAdb()
+        adbManager.initializeAdb()
         // Poll for devices every 2 seconds
         while (true) {
-            DeviceManager.refreshDevices()
+            deviceManager.refreshDevices()
             kotlinx.coroutines.delay(2000)
         }
     }
@@ -62,13 +72,18 @@ fun App() {
                 }
                 
                 // Main Content
-                when (selectedDestination) {
-                    "Dashboard" -> DashboardPage()
-                    "Settings" -> SettingsPage()
-                    "Design" -> DesignPage()
-                    "Apps" -> AppsPage()
-                    "Help" -> HelpPage()
-                    else -> DashboardPage()
+                Surface(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    when (selectedDestination) {
+                        "Apps" -> AppsPage()
+                        "Terminal" -> TerminalPage()
+                        "Design" -> DesignPage()
+                        "Settings" -> SettingsPage()
+                        "Help" -> HelpPage()
+                        else -> AppsPage()
+                    }
                 }
             }
         }
