@@ -32,6 +32,9 @@ import com.remora.design.DesignPage
 import com.remora.help.HelpPage
 import com.remora.terminal.TerminalPage
 import com.remora.preferences.PreferencePage
+import com.remora.preferences.PreferenceStore
+import com.remora.preferences.AppTheme
+import androidx.compose.foundation.isSystemInDarkTheme
 
 import org.koin.compose.koinInject
 
@@ -39,8 +42,25 @@ import org.koin.compose.koinInject
 @Preview
 fun App(
     adbManager: AdbManager = koinInject(),
-    deviceManager: DeviceManager = koinInject()
+    deviceManager: DeviceManager = koinInject(),
+    preferenceStore: PreferenceStore = koinInject()
 ) {
+    val selectedTheme by preferenceStore.theme.collectAsState()
+    val seedColorValue by preferenceStore.seedColor.collectAsState()
+    
+    val isDark = when (selectedTheme) {
+        AppTheme.System -> isSystemInDarkTheme()
+        AppTheme.Light -> false
+        AppTheme.Dark -> true
+    }
+    
+    val seedColor = Color(seedColorValue)
+    val colorScheme = if (isDark) {
+        darkColorScheme(primary = seedColor)
+    } else {
+        lightColorScheme(primary = seedColor)
+    }
+
     var selectedDestination by remember { mutableStateOf("Apps") }
     var isSidebarVisible by remember { mutableStateOf(true) }
     var showPreferences by remember { mutableStateOf(false) }
@@ -59,7 +79,7 @@ fun App(
         }
     }
     
-    MaterialTheme {
+    MaterialTheme(colorScheme = colorScheme) {
         Box(
             modifier = Modifier
                 .fillMaxSize()

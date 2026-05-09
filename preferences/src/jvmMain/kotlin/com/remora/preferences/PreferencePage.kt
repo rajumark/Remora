@@ -1,17 +1,42 @@
 package com.remora.preferences
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import org.koin.compose.koinInject
+
+private val seedColors = listOf(
+    0xFF6750A4, // Purple
+    0xFF006C4C, // Green
+    0xFF984061, // Pink
+    0xFF0061A4, // Blue
+    0xFF7D5260, // Reddish
+    0xFF6B5E40, // Olive
+    0xFF4E6078, // Slate
+    0xFF006A6A, // Teal
+    0xFF625B71, // Gray-ish
+    0xFFA03D2A, // Orange-ish
+    0xFF595B71, // Indigo-ish
+    0xFF006874  // Cyan-ish
+)
 
 @Composable
 fun PreferencePage(
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    preferenceStore: PreferenceStore = koinInject()
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -27,7 +52,7 @@ fun PreferencePage(
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 6.dp
         ) {
-            var selectedTab by remember { mutableStateOf("Theme") }
+            var selectedTab by remember { mutableStateOf("Appearance") }
             
             Row(modifier = Modifier.fillMaxSize()) {
                 // Sidebar
@@ -45,13 +70,11 @@ fun PreferencePage(
                     )
                     
                     NavigationDrawerItem(
-                        label = { Text("Theme") },
-                        selected = selectedTab == "Theme",
-                        onClick = { selectedTab = "Theme" },
+                        label = { Text("Appearance") },
+                        selected = selectedTab == "Appearance",
+                        onClick = { selectedTab = "Appearance" },
                         modifier = Modifier.padding(horizontal = 12.dp)
                     )
-                    
-                    // Future items will be added here
                 }
                 
                 VerticalDivider(
@@ -68,7 +91,7 @@ fun PreferencePage(
                         .padding(40.dp)
                 ) {
                     when (selectedTab) {
-                        "Theme" -> ThemePreferencePage()
+                        "Appearance" -> AppearancePreferencePage(preferenceStore)
                     }
                 }
             }
@@ -77,78 +100,113 @@ fun PreferencePage(
 }
 
 @Composable
-fun ThemePreferencePage() {
-    var selectedTheme by remember { mutableStateOf("System") }
+fun AppearancePreferencePage(preferenceStore: PreferenceStore) {
+    val selectedTheme by preferenceStore.theme.collectAsState()
+    val selectedSeedColor by preferenceStore.seedColor.collectAsState()
     
-    Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-        Text(
-            text = "Theme",
-            style = MaterialTheme.typography.headlineMedium
-        )
-        
-        Text(
-            text = "Choose how Remora looks to you. Select a theme or let it follow your system settings.",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            ThemeOption(
-                label = "System",
-                description = "Follow system appearance",
-                selected = selectedTheme == "System",
-                onClick = { selectedTheme = "System" }
+    Column(
+        verticalArrangement = Arrangement.spacedBy(32.dp),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        // Theme Section
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text(
+                text = "Theme",
+                style = MaterialTheme.typography.titleLarge
             )
-            ThemeOption(
-                label = "Light",
-                description = "Always use light theme",
-                selected = selectedTheme == "Light",
-                onClick = { selectedTheme = "Light" }
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                AppTheme.entries.forEach { theme ->
+                    ThemeCard(
+                        theme = theme,
+                        selected = selectedTheme == theme,
+                        onClick = { preferenceStore.setTheme(theme) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+
+        // Color Section
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text(
+                text = "Accent Color",
+                style = MaterialTheme.typography.titleLarge
             )
-            ThemeOption(
-                label = "Dark",
-                description = "Always use dark theme",
-                selected = selectedTheme == "Dark",
-                onClick = { selectedTheme = "Dark" }
+            
+            Text(
+                text = "Choose a seed color to generate your unique Material 3 color scheme.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(6),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.height(120.dp)
+            ) {
+                items(seedColors) { colorValue ->
+                    ColorCircle(
+                        color = Color(colorValue),
+                        selected = selectedSeedColor == colorValue,
+                        onClick = { preferenceStore.setSeedColor(colorValue) }
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun ThemeOption(
-    label: String,
-    description: String,
+private fun ThemeCard(
+    theme: AppTheme,
     selected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Surface(
         onClick = onClick,
         shape = MaterialTheme.shapes.medium,
-        color = if (selected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface,
-        modifier = Modifier.fillMaxWidth()
+        color = if (selected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        modifier = modifier
     ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            RadioButton(
-                selected = selected,
-                onClick = onClick
-            )
+            RadioButton(selected = selected, onClick = onClick)
+            Text(text = theme.name, style = MaterialTheme.typography.labelLarge)
+        }
+    }
+}
+
+@Composable
+private fun ColorCircle(
+    color: Color,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .clip(CircleShape)
+            .background(color)
+            .clickable(onClick = onClick)
+            .padding(4.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        if (selected) {
+            Surface(
+                modifier = Modifier.size(16.dp),
+                shape = CircleShape,
+                color = Color.White,
+                tonalElevation = 4.dp
+            ) {}
         }
     }
 }
