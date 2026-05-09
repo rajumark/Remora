@@ -3,6 +3,9 @@ package com.remora.preferences
 import java.util.prefs.Preferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import androidx.compose.material3.ColorScheme
+import androidx.compose.ui.graphics.Color
+import com.materialkolor.dynamicColorScheme
 
 enum class AppTheme {
     System, Light, Dark
@@ -41,5 +44,16 @@ class PreferenceStore {
     private fun loadSeedColor(): Long {
         // Default Material 3 blue seed color
         return prefs.getLong("seed_color", 0xFF6750A4)
+    }
+
+    /**
+     * Generates a full Material 3 ColorScheme based on a seed color using the MaterialKolor library.
+     */
+    fun generateColorScheme(seedColor: Color, isDark: Boolean): ColorScheme {
+        return dynamicColorScheme(
+            seedColor = seedColor,
+            isDark = isDark,
+            isAmoled = false
+        )
     }
 }

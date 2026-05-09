@@ -15,6 +15,7 @@ kotlin {
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
             implementation(libs.koin.compose)
+            implementation(libs.material.kolor)
         }
     }
 }

@@ -55,11 +55,7 @@ fun App(
     }
     
     val seedColor = Color(seedColorValue)
-    val colorScheme = if (isDark) {
-        darkColorScheme(primary = seedColor)
-    } else {
-        lightColorScheme(primary = seedColor)
-    }
+    val colorScheme = preferenceStore.generateColorScheme(seedColor, isDark)
 
     var selectedDestination by remember { mutableStateOf("Apps") }
     var isSidebarVisible by remember { mutableStateOf(true) }
