@@ -2,14 +2,31 @@ package com.remora.desktop
 
 import java.io.*
 import java.util.zip.ZipInputStream
+import androidx.compose.runtime.*
 
 /**
  * Manages ADB (Android Debug Bridge) functionality including extraction and command execution
  */
 object AdbManager {
     
-    private var extractedAdbPath: String? = null
     private var isInitialized = false
+    
+    /**
+     * Observable state for the current ADB path
+     */
+    var adbPath by mutableStateOf<String?>(null)
+        private set
+
+    /**
+     * Observable state for the list of connected devices
+     */
+    var connectedDevices by mutableStateOf(emptyList<String>())
+        private set
+
+    /**
+     * Observable state for the currently selected device
+     */
+    var selectedDevice by mutableStateOf<String?>(null)
     
     /**
      * Get the platform-specific application support directory
@@ -40,8 +57,8 @@ object AdbManager {
      * Initialize ADB by extracting the appropriate platform tools to a persistent directory
      */
     suspend fun initializeAdb(): Result<String> = runCatching {
-        if (isInitialized && extractedAdbPath != null) {
-            return@runCatching extractedAdbPath!!
+        if (isInitialized && adbPath != null) {
+            return@runCatching adbPath!!
         }
         
         val platform = getCurrentPlatform()
@@ -52,9 +69,10 @@ object AdbManager {
         
         // If ADB already exists, just return the path
         if (adbFile.exists()) {
-            extractedAdbPath = binDir.absolutePath
+            val path = binDir.absolutePath
+            adbPath = path
             isInitialized = true
-            return@runCatching extractedAdbPath!!
+            return@runCatching path
         }
         
         // Ensure bin directory exists
@@ -89,9 +107,10 @@ object AdbManager {
             }
         }
         
-        extractedAdbPath = binDir.absolutePath
+        val path = binDir.absolutePath
+        adbPath = path
         isInitialized = true
-        extractedAdbPath!!
+        path
     }
     
     /**
@@ -139,14 +158,14 @@ object AdbManager {
      * Clean up extracted ADB files (Used only if full reset is needed)
      */
     fun cleanup() {
-        extractedAdbPath?.let { path ->
+        adbPath?.let { path ->
             try {
                 File(path).deleteRecursively()
             } catch (e: Exception) {
                 println("Warning: Failed to cleanup ADB files: ${e.message}")
             }
         }
-        extractedAdbPath = null
+        adbPath = null
         isInitialized = false
     }
 
@@ -180,9 +199,20 @@ object AdbManager {
         // emulator-5554	device
         // device-id	unauthorized
         
-        output.drop(1) // Drop "List of devices attached"
+        val devices = output.drop(1) // Drop "List of devices attached"
             .map { it.trim() }
             .filter { it.isNotEmpty() && it.contains("\t") }
             .map { it.split("\t")[0] }
+
+        // Update global state
+        if (connectedDevices != devices) {
+            connectedDevices = devices
+            // Auto-selection logic
+            if (selectedDevice == null || !devices.contains(selectedDevice)) {
+                selectedDevice = devices.firstOrNull()
+            }
+        }
+        
+        devices
     }
 }

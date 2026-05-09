@@ -57,30 +57,9 @@ fun AppNavigationDrawer(
     selectedDestination: String = "Dashboard",
     onNavigationItemClick: (String) -> Unit = {}
 ) {
-    var devices by remember { mutableStateOf(emptyList<String>()) }
-    var selectedDevice by remember { mutableStateOf<String?>(null) }
     var showDeviceDropdown by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            AdbManager.getDevices().onSuccess { newDevices ->
-                // Check if device list has changed to avoid unnecessary updates and flickering
-                if (devices != newDevices) {
-                    devices = newDevices
-                    
-                    // Auto-selection logic: 
-                    // If the currently selected device is no longer in the list, or if no device is selected,
-                    // automatically pick the first available device.
-                    if (selectedDevice == null || !newDevices.contains(selectedDevice)) {
-                        selectedDevice = newDevices.firstOrNull()
-                    }
-                }
-            }.onFailure {
-                println("Failed to fetch devices: ${it.message}")
-            }
-            delay(2000)
-        }
-    }
+    val devices = AdbManager.connectedDevices
+    val selectedDevice = AdbManager.selectedDevice
 
     Column(
         modifier = modifier
@@ -141,7 +120,7 @@ fun AppNavigationDrawer(
                             )
                         },
                         onClick = {
-                            selectedDevice = deviceId
+                            AdbManager.selectedDevice = deviceId
                             showDeviceDropdown = false
                         },
                         leadingIcon = {

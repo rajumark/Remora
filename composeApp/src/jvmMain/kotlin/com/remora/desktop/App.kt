@@ -29,6 +29,16 @@ import remora.composeapp.generated.resources.compose_multiplatform
 fun App() {
     var selectedDestination by remember { mutableStateOf("Dashboard") }
     var isSidebarVisible by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        // Initialize ADB once at startup
+        AdbManager.initializeAdb()
+        // Poll for devices every 2 seconds
+        while (true) {
+            AdbManager.getDevices()
+            kotlinx.coroutines.delay(2000)
+        }
+    }
     
     MaterialTheme {
         Box(
