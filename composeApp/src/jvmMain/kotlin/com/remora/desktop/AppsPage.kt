@@ -7,11 +7,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
-import remora.composeapp.generated.resources.Res
-import remora.composeapp.generated.resources.ic_mobile
-
 import com.remora.adb.AdbManager
 import com.remora.device.DeviceManager
+import com.remora.device.DeviceResources
 
 @Composable
 fun AppsPage() {
@@ -61,7 +59,7 @@ fun AppsPage() {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
-                        painter = painterResource(Res.drawable.ic_mobile),
+                        painter = painterResource(DeviceResources.ic_mobile),
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
                         tint = MaterialTheme.colorScheme.outlineVariant

@@ -2,6 +2,7 @@ package com.remora.desktop
 
 import com.remora.adb.AdbManager
 import com.remora.device.DeviceManager
+import com.remora.device.DeviceSelector
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -18,7 +19,6 @@ import remora.composeapp.generated.resources.ic_settings
 import remora.composeapp.generated.resources.ic_profile
 import remora.composeapp.generated.resources.ic_design
 import remora.composeapp.generated.resources.ic_help
-import remora.composeapp.generated.resources.ic_mobile
 
 data class NavigationItem(
     val destination: String,
@@ -59,10 +59,6 @@ fun AppNavigationDrawer(
     selectedDestination: String = "Dashboard",
     onNavigationItemClick: (String) -> Unit = {}
 ) {
-    var showDeviceDropdown by remember { mutableStateOf(false) }
-    val devices = DeviceManager.connectedDevices
-    val selectedDevice = DeviceManager.selectedDevice
-
     Column(
         modifier = modifier
             .width(240.dp)
@@ -70,72 +66,8 @@ fun AppNavigationDrawer(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Device Selection Section
-        Box {
-            TextButton(
-                onClick = { if (devices.isNotEmpty()) showDeviceDropdown = true },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = devices.isNotEmpty()
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painterResource(Res.drawable.ic_mobile),
-                        contentDescription = null,
-                        tint = if (devices.isEmpty()) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = selectedDevice ?: "No device",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = if (devices.isEmpty()) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1
-                        )
-                        if (devices.size > 1) {
-                            Text(
-                                text = "${devices.size} devices available",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Dropdown for selecting between multiple devices
-            DropdownMenu(
-                expanded = showDeviceDropdown,
-                onDismissRequest = { showDeviceDropdown = false },
-                modifier = Modifier.width(208.dp)
-            ) {
-                devices.forEach { deviceId ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = deviceId,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = if (deviceId == selectedDevice) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                            )
-                        },
-                        onClick = {
-                            DeviceManager.selectedDevice = deviceId
-                            showDeviceDropdown = false
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painterResource(Res.drawable.ic_mobile),
-                                contentDescription = null,
-                                tint = if (deviceId == selectedDevice) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
-                            )
-                        }
-                    )
-                }
-            }
-        }
+        // Device Selection Section (Now modularized)
+        DeviceSelector()
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
