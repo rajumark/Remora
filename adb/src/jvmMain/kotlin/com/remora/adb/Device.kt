@@ -9,5 +9,7 @@ package com.remora.adb
 data class Device(
     val serial: String,
     val osVersion: String = "Unknown",
-    val model: String = "Unknown Device"
+    val apiLevel: String = "Unknown",
+    val model: String = "Unknown Device",
+    val isEmulator: Boolean = false
 )

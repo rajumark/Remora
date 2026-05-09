@@ -44,7 +44,7 @@ fun DeviceSelector(
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = selectedDevice?.model ?: "No device",
+                        text = selectedDevice?.serial ?: "No device",
                         style = MaterialTheme.typography.labelLarge,
                         color = if (devices.isEmpty()) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface,
                         maxLines = 1
@@ -77,12 +77,12 @@ fun DeviceSelector(
                     text = {
                         Column {
                             Text(
-                                text = device.model,
+                                text = device.serial,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = if (device.serial == selectedDevice?.serial) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "Android ${device.osVersion} • ${device.serial}",
+                                text = "Android ${device.osVersion}",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.outline
                             )

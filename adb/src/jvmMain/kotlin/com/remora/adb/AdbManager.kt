@@ -206,8 +206,13 @@ object AdbManager {
 
         serials.map { serial ->
             val osVersion = getDeviceProperty(serial, "ro.build.version.release")
+            val apiLevel = getDeviceProperty(serial, "ro.build.version.sdk")
             val model = getDeviceProperty(serial, "ro.product.model")
-            Device(serial, osVersion, model)
+            val isEmulator = serial.startsWith("emulator-") || 
+                            getDeviceProperty(serial, "ro.kernel.qemu") == "1" ||
+                            model.contains("sdk_gphone", ignoreCase = true)
+            
+            Device(serial, osVersion, apiLevel, model, isEmulator)
         }
     }
 }
