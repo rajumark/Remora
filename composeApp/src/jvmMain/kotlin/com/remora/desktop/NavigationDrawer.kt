@@ -17,6 +17,7 @@ import remora.composeapp.generated.resources.ic_settings
 import remora.composeapp.generated.resources.ic_profile
 import remora.composeapp.generated.resources.ic_design
 import remora.composeapp.generated.resources.ic_help
+import remora.composeapp.generated.resources.ic_mobile
 
 data class NavigationItem(
     val destination: String,
@@ -70,7 +71,20 @@ fun AppNavigationDrawer(
             onClick = { /* Handle click */ },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Poco X5 Pro")
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painterResource(Res.drawable.ic_mobile),
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Poco X5 Pro",
+                    maxLines = 1
+                )
+            }
         }
 
         // Navigation Items
