@@ -11,6 +11,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":adb"))
             implementation(project(":device"))
+            implementation(project(":design"))
             implementation(libs.koin.compose)
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
