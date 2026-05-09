@@ -8,30 +8,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-trigger:
-    name: Check for #go trigger
-    runs-on: ubuntu-latest
-    outputs:
-      should-run: ${{ steps.check-trigger.outputs.should-run }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check commit message for #go
-        id: check-trigger
-        run: |
-          if git log --format=%B -n 1 ${{ github.sha }} | grep -q "#go"; then
-            echo "should-run=true" >> $GITHUB_OUTPUT
-          else
-            echo "should-run=false" >> $GITHUB_OUTPUT
-          fi
-
   build-windows:
     name: Build Windows MSI
-    needs: check-trigger
-    if: needs.check-trigger.outputs.should-run == 'true'
+    if: contains(github.event.head_commit.message, '#go')
     runs-on: windows-latest
     steps:
       - name: Checkout code
@@ -59,8 +38,7 @@ jobs:
 
   build-linux:
     name: Build Linux AppImage
-    needs: check-trigger
-    if: needs.check-trigger.outputs.should-run == 'true'
+    if: contains(github.event.head_commit.message, '#go')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -92,8 +70,7 @@ jobs:
 
   build-mac-intel:
     name: Build Mac DMG (Intel)
-    needs: check-trigger
-    if: needs.check-trigger.outputs.should-run == 'true'
+    if: contains(github.event.head_commit.message, '#go')
     runs-on: macos-13
     steps:
       - name: Checkout code
@@ -120,8 +97,7 @@ jobs:
 
   build-mac-apple-silicon:
     name: Build Mac DMG (Apple Silicon)
-    needs: check-trigger
-    if: needs.check-trigger.outputs.should-run == 'true'
+    if: contains(github.event.head_commit.message, '#go')
     runs-on: macos-14
     steps:
       - name: Checkout code
@@ -148,12 +124,24 @@ jobs:
 
   create-release:
     name: Create Release
-    needs: [check-trigger, build-windows, build-linux, build-mac-intel, build-mac-apple-silicon]
-    if: needs.check-trigger.outputs.should-run == 'true'
+    needs: [build-windows, build-linux, build-mac-intel, build-mac-apple-silicon]
+    if: contains(github.event.head_commit.message, '#go')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Git user
+        run: |
+          git config --global user.name "rajumark"
+          git config --global user.email "raju348636@gmail.com"
+
+      - name: Extract version from build.gradle.kts
+        id: version
+        run: |
+          version=$(grep -oE 'packageVersion = "[0-9]+\.[0-9]+\.[0-9]+"' composeApp/build.gradle.kts | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "Extracted version: $version"
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -166,8 +154,8 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v1.0.0
-          name: Remora-1.0.0
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Remora-${{ steps.version.outputs.version }}
           draft: false
           prerelease: false
           files: |
