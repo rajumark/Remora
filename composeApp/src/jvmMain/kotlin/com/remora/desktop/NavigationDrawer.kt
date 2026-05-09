@@ -13,47 +13,55 @@ import remora.composeapp.generated.resources.ic_settings
 import remora.composeapp.generated.resources.ic_profile
 import remora.composeapp.generated.resources.ic_help
 
+data class NavigationItem(
+    val destination: String,
+    val label: String,
+    val iconResource: DrawableResource
+)
+
+private val navigationItems = listOf(
+    NavigationItem(
+        destination = "Dashboard",
+        label = "Dashboard",
+        iconResource = Res.drawable.ic_dashboard
+    ),
+    NavigationItem(
+        destination = "Settings",
+        label = "Settings",
+        iconResource = Res.drawable.ic_settings
+    ),
+    NavigationItem(
+        destination = "Profile",
+        label = "Profile",
+        iconResource = Res.drawable.ic_profile
+    ),
+    NavigationItem(
+        destination = "Help",
+        label = "Help",
+        iconResource = Res.drawable.ic_help
+    )
+)
+
 @Composable
 fun AppNavigationDrawer(
     modifier: Modifier = Modifier,
     selectedDestination: String = "Dashboard",
     onNavigationItemClick: (String) -> Unit = {}
 ) {
-    Card(
+    Column(
         modifier = modifier
             .width(240.dp)
             .fillMaxHeight()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            // Navigation Items
+        // Navigation Items
+        navigationItems.forEach { item ->
             NavigationDrawerItem(
-                icon = { Icon(painterResource(Res.drawable.ic_dashboard), contentDescription = null) },
-                label = { Text("Dashboard") },
-                selected = selectedDestination == "Dashboard",
-                onClick = { onNavigationItemClick("Dashboard") }
-            )
-            NavigationDrawerItem(
-                icon = { Icon(painterResource(Res.drawable.ic_settings), contentDescription = null) },
-                label = { Text("Settings") },
-                selected = selectedDestination == "Settings",
-                onClick = { onNavigationItemClick("Settings") }
-            )
-            NavigationDrawerItem(
-                icon = { Icon(painterResource(Res.drawable.ic_profile), contentDescription = null) },
-                label = { Text("Profile") },
-                selected = selectedDestination == "Profile",
-                onClick = { onNavigationItemClick("Profile") }
-            )
-            NavigationDrawerItem(
-                icon = { Icon(painterResource(Res.drawable.ic_help), contentDescription = null) },
-                label = { Text("Help") },
-                selected = selectedDestination == "Help",
-                onClick = { onNavigationItemClick("Help") }
+                icon = { Icon(painterResource(item.iconResource), contentDescription = null) },
+                label = { Text(item.label) },
+                selected = selectedDestination == item.destination,
+                onClick = { onNavigationItemClick(item.destination) }
             )
         }
     }

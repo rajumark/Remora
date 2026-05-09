@@ -3,13 +3,16 @@ package com.remora.desktop
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,11 +23,16 @@ import org.jetbrains.compose.resources.DrawableResource
 
 import remora.composeapp.generated.resources.Res
 import remora.composeapp.generated.resources.compose_multiplatform
+import remora.composeapp.generated.resources.ic_menu
+import remora.composeapp.generated.resources.ic_menu_open
+
+@OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
 @Preview
 fun App() {
     var selectedDestination by remember { mutableStateOf("Dashboard") }
+    var isSidebarVisible by remember { mutableStateOf(true) }
     
     MaterialTheme {
         Scaffold(
@@ -32,19 +40,23 @@ fun App() {
         ) { paddingValues ->
             Row(modifier = Modifier.fillMaxSize()) {
                 // Navigation Menu
-                AppNavigationDrawer(
-                    selectedDestination = selectedDestination,
-                    onNavigationItemClick = { destination ->
-                        selectedDestination = destination
-                        println("Navigating to: $destination")
-                    }
-                )
+                if (isSidebarVisible) {
+                    AppNavigationDrawer(
+                        modifier = Modifier.padding(paddingValues),
+                        selectedDestination = selectedDestination,
+                        onNavigationItemClick = { destination ->
+                            selectedDestination = destination
+                            println("Navigating to: $destination")
+                        }
+                    )
+                }
                 
                 // Main Content
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues),
+                        .padding(paddingValues)
+                        .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
