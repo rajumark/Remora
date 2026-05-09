@@ -2,13 +2,11 @@ package com.remora.desktop
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import remora.composeapp.generated.resources.Res
@@ -59,6 +57,31 @@ fun AppNavigationDrawer(
     selectedDestination: String = "Dashboard",
     onNavigationItemClick: (String) -> Unit = {}
 ) {
+    var devices by remember { mutableStateOf(emptyList<String>()) }
+    var selectedDevice by remember { mutableStateOf<String?>(null) }
+    var showDeviceDropdown by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            AdbManager.getDevices().onSuccess { newDevices ->
+                // Check if device list has changed to avoid unnecessary updates and flickering
+                if (devices != newDevices) {
+                    devices = newDevices
+                    
+                    // Auto-selection logic: 
+                    // If the currently selected device is no longer in the list, or if no device is selected,
+                    // automatically pick the first available device.
+                    if (selectedDevice == null || !newDevices.contains(selectedDevice)) {
+                        selectedDevice = newDevices.firstOrNull()
+                    }
+                }
+            }.onFailure {
+                println("Failed to fetch devices: ${it.message}")
+            }
+            delay(2000)
+        }
+    }
+
     Column(
         modifier = modifier
             .width(240.dp)
@@ -66,26 +89,74 @@ fun AppNavigationDrawer(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Text Button at top
-        TextButton(
-            onClick = { /* Handle click */ },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                 
+        // Device Selection Section
+        Box {
+            TextButton(
+                onClick = { if (devices.isNotEmpty()) showDeviceDropdown = true },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = devices.isNotEmpty()
             ) {
-                Icon(
-                    painterResource(Res.drawable.ic_mobile),
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Poco X5 Pro",
-                    maxLines = 1
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painterResource(Res.drawable.ic_mobile),
+                        contentDescription = null,
+                        tint = if (devices.isEmpty()) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = selectedDevice ?: "No device",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = if (devices.isEmpty()) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1
+                        )
+                        if (devices.size > 1) {
+                            Text(
+                                text = "${devices.size} devices available",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Dropdown for selecting between multiple devices
+            DropdownMenu(
+                expanded = showDeviceDropdown,
+                onDismissRequest = { showDeviceDropdown = false },
+                modifier = Modifier.width(208.dp)
+            ) {
+                devices.forEach { deviceId ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = deviceId,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (deviceId == selectedDevice) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        onClick = {
+                            selectedDevice = deviceId
+                            showDeviceDropdown = false
+                        },
+                        leadingIcon = {
+                            Icon(
+                                painterResource(Res.drawable.ic_mobile),
+                                contentDescription = null,
+                                tint = if (deviceId == selectedDevice) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                            )
+                        }
+                    )
+                }
             }
         }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
         // Navigation Items
         navigationItems.forEach { item ->

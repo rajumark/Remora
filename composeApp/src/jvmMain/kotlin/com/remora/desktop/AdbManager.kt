@@ -149,4 +149,40 @@ object AdbManager {
         extractedAdbPath = null
         isInitialized = false
     }
+
+    /**
+     * Get list of connected devices using ADB
+     */
+    suspend fun getDevices(): Result<List<String>> = runCatching {
+        val adbPath = initializeAdb().getOrThrow()
+        val adbExecutable = if (getCurrentPlatform() == "windows") {
+            File(adbPath, "platform-tools/adb.exe")
+        } else {
+            File(adbPath, "platform-tools/adb")
+        }
+        
+        if (!adbExecutable.exists()) {
+            throw IllegalStateException("ADB executable not found at: ${adbExecutable.absolutePath}")
+        }
+        
+        val process = ProcessBuilder(adbExecutable.absolutePath, "devices").start()
+        val output = process.inputStream.bufferedReader().use { it.readLines() }
+        val exitCode = process.waitFor()
+        
+        if (exitCode != 0) {
+            val error = process.errorStream.bufferedReader().use { it.readText() }
+            throw RuntimeException("ADB devices command failed with exit code $exitCode. Error: $error")
+        }
+        
+        // Parse output
+        // Example output:
+        // List of devices attached
+        // emulator-5554	device
+        // device-id	unauthorized
+        
+        output.drop(1) // Drop "List of devices attached"
+            .map { it.trim() }
+            .filter { it.isNotEmpty() && it.contains("\t") }
+            .map { it.split("\t")[0] }
+    }
 }
