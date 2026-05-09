@@ -57,7 +57,8 @@ private val navigationItems = listOf(
 fun AppNavigationDrawer(
     modifier: Modifier = Modifier,
     selectedDestination: String = "Apps",
-    onNavigationItemClick: (String) -> Unit = {}
+    onNavigationItemClick: (String) -> Unit = {},
+    onPreferencesClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -80,5 +81,16 @@ fun AppNavigationDrawer(
                 onClick = { onNavigationItemClick(item.destination) }
             )
         }
+
+        Spacer(Modifier.weight(1f))
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+        NavigationDrawerItem(
+            icon = { Icon(painterResource(Res.drawable.ic_settings), contentDescription = null) },
+            label = { Text("Preferences") },
+            selected = false,
+            onClick = onPreferencesClick
+        )
     }
 }

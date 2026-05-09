@@ -31,6 +31,7 @@ import com.remora.settings.SettingsPage
 import com.remora.design.DesignPage
 import com.remora.help.HelpPage
 import com.remora.terminal.TerminalPage
+import com.remora.preferences.PreferencePage
 
 import org.koin.compose.koinInject
 
@@ -42,6 +43,11 @@ fun App(
 ) {
     var selectedDestination by remember { mutableStateOf("Apps") }
     var isSidebarVisible by remember { mutableStateOf(true) }
+    var showPreferences by remember { mutableStateOf(false) }
+
+    if (showPreferences) {
+        PreferencePage(onDismissRequest = { showPreferences = false })
+    }
 
     LaunchedEffect(Unit) {
         // Initialize ADB once at startup
@@ -67,7 +73,8 @@ fun App(
                         onNavigationItemClick = { destination ->
                             selectedDestination = destination
                             println("Navigating to: $destination")
-                        }
+                        },
+                        onPreferencesClick = { showPreferences = true }
                     )
                 }
                 

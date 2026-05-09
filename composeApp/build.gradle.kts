@@ -19,6 +19,7 @@ kotlin {
             implementation(project(":design"))
             implementation(project(":terminal"))
             implementation(project(":help"))
+            implementation(project(":preferences"))
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.compose.runtime)
