@@ -1,5 +1,8 @@
 package com.remora.desktop
 
+import com.remora.adb.AdbManager
+import com.remora.device.DeviceManager
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -50,7 +53,6 @@ private val navigationItems = listOf(
         iconResource = Res.drawable.ic_help
     )
 )
-
 @Composable
 fun AppNavigationDrawer(
     modifier: Modifier = Modifier,
@@ -58,8 +60,8 @@ fun AppNavigationDrawer(
     onNavigationItemClick: (String) -> Unit = {}
 ) {
     var showDeviceDropdown by remember { mutableStateOf(false) }
-    val devices = AdbManager.connectedDevices
-    val selectedDevice = AdbManager.selectedDevice
+    val devices = DeviceManager.connectedDevices
+    val selectedDevice = DeviceManager.selectedDevice
 
     Column(
         modifier = modifier
@@ -120,7 +122,7 @@ fun AppNavigationDrawer(
                             )
                         },
                         onClick = {
-                            AdbManager.selectedDevice = deviceId
+                            DeviceManager.selectedDevice = deviceId
                             showDeviceDropdown = false
                         },
                         leadingIcon = {

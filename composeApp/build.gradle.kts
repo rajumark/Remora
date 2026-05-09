@@ -12,6 +12,8 @@ kotlin {
     
     sourceSets {
         commonMain.dependencies {
+            implementation(project(":adb"))
+            implementation(project(":device"))
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)

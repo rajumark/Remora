@@ -1,4 +1,4 @@
-package com.remora.desktop
+package com.remora.adb
 
 import java.io.*
 import java.util.zip.ZipInputStream
@@ -17,17 +17,6 @@ object AdbManager {
     var adbPath by mutableStateOf<String?>(null)
         private set
 
-    /**
-     * Observable state for the list of connected devices
-     */
-    var connectedDevices by mutableStateOf(emptyList<String>())
-        private set
-
-    /**
-     * Observable state for the currently selected device
-     */
-    var selectedDevice by mutableStateOf<String?>(null)
-    
     /**
      * Get the platform-specific application support directory
      */
@@ -193,26 +182,9 @@ object AdbManager {
             throw RuntimeException("ADB devices command failed with exit code $exitCode. Error: $error")
         }
         
-        // Parse output
-        // Example output:
-        // List of devices attached
-        // emulator-5554	device
-        // device-id	unauthorized
-        
-        val devices = output.drop(1) // Drop "List of devices attached"
+        output.drop(1) // Drop "List of devices attached"
             .map { it.trim() }
             .filter { it.isNotEmpty() && it.contains("\t") }
             .map { it.split("\t")[0] }
-
-        // Update global state
-        if (connectedDevices != devices) {
-            connectedDevices = devices
-            // Auto-selection logic
-            if (selectedDevice == null || !devices.contains(selectedDevice)) {
-                selectedDevice = devices.firstOrNull()
-            }
-        }
-        
-        devices
     }
 }

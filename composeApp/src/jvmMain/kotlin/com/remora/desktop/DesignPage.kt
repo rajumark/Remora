@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.selection.SelectionContainer
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
+import com.remora.adb.AdbManager
 
 @Composable
 fun DesignPage() {

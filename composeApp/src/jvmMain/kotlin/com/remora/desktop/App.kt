@@ -24,6 +24,9 @@ import org.jetbrains.compose.resources.DrawableResource
 import remora.composeapp.generated.resources.Res
 import remora.composeapp.generated.resources.compose_multiplatform
 
+import com.remora.adb.AdbManager
+import com.remora.device.DeviceManager
+
 @Composable
 @Preview
 fun App() {
@@ -35,7 +38,7 @@ fun App() {
         AdbManager.initializeAdb()
         // Poll for devices every 2 seconds
         while (true) {
-            AdbManager.getDevices()
+            DeviceManager.refreshDevices()
             kotlinx.coroutines.delay(2000)
         }
     }

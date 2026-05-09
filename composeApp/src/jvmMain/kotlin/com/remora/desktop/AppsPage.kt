@@ -10,10 +10,13 @@ import org.jetbrains.compose.resources.painterResource
 import remora.composeapp.generated.resources.Res
 import remora.composeapp.generated.resources.ic_mobile
 
+import com.remora.adb.AdbManager
+import com.remora.device.DeviceManager
+
 @Composable
 fun AppsPage() {
     val adbPath = AdbManager.adbPath
-    val selectedDevice = AdbManager.selectedDevice
+    val selectedDevice = DeviceManager.selectedDevice
 
     Column(
         modifier = Modifier
