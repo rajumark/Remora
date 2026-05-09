@@ -1,7 +1,6 @@
 package com.remora.preferences
 
-import com.russhwolf.multiplatformsettings.Settings
-import com.russhwolf.multiplatformsettings.set
+import java.util.prefs.Preferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -10,7 +9,7 @@ enum class AppTheme {
 }
 
 class PreferenceStore {
-    private val settings: Settings = Settings()
+    private val prefs = Preferences.userRoot().node("com.remora.desktop")
 
     private val _theme = MutableStateFlow(loadTheme())
     val theme: StateFlow<AppTheme> = _theme
@@ -19,17 +18,19 @@ class PreferenceStore {
     val seedColor: StateFlow<Long> = _seedColor
 
     fun setTheme(theme: AppTheme) {
-        settings["theme"] = theme.name
+        prefs.put("theme", theme.name)
+        prefs.flush()
         _theme.value = theme
     }
 
     fun setSeedColor(color: Long) {
-        settings["seed_color"] = color
+        prefs.putLong("seed_color", color)
+        prefs.flush()
         _seedColor.value = color
     }
 
     private fun loadTheme(): AppTheme {
-        val name = settings.getString("theme", AppTheme.System.name)
+        val name = prefs.get("theme", AppTheme.System.name)
         return try {
             AppTheme.valueOf(name)
         } catch (e: Exception) {
@@ -39,6 +40,6 @@ class PreferenceStore {
 
     private fun loadSeedColor(): Long {
         // Default Material 3 blue seed color
-        return settings.getLong("seed_color", 0xFF6750A4)
+        return prefs.getLong("seed_color", 0xFF6750A4)
     }
 }
