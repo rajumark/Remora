@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ProfilePage() {
+fun AppsPage() {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -16,7 +16,7 @@ fun ProfilePage() {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Profile",
+            text = "Apps",
             style = MaterialTheme.typography.headlineMedium
         )
     }

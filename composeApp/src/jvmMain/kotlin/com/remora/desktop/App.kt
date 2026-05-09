@@ -53,7 +53,7 @@ fun App() {
                     "Dashboard" -> DashboardPage()
                     "Settings" -> SettingsPage()
                     "Design" -> DesignPage()
-                    "Profile" -> ProfilePage()
+                    "Apps" -> AppsPage()
                     "Help" -> HelpPage()
                     else -> DashboardPage()
                 }

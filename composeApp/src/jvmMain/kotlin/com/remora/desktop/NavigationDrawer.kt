@@ -3,6 +3,10 @@ package com.remora.desktop
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
@@ -37,8 +41,8 @@ private val navigationItems = listOf(
         iconResource = Res.drawable.ic_design
     ),
     NavigationItem(
-        destination = "Profile",
-        label = "Profile",
+        destination = "Apps",
+        label = "Apps",
         iconResource = Res.drawable.ic_profile
     ),
     NavigationItem(
@@ -61,6 +65,14 @@ fun AppNavigationDrawer(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        // Text Button at top
+        TextButton(
+            onClick = { /* Handle click */ },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Poco X5 Pro")
+        }
+
         // Navigation Items
         navigationItems.forEach { item ->
             NavigationDrawerItem(
