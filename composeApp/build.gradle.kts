@@ -35,7 +35,6 @@ kotlin {
 compose.desktop {
     application {
         mainClass = "com.remora.desktop.MainKt"
-
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.remora.desktop"
