@@ -11,6 +11,7 @@ import remora.composeapp.generated.resources.Res
 import remora.composeapp.generated.resources.ic_dashboard
 import remora.composeapp.generated.resources.ic_settings
 import remora.composeapp.generated.resources.ic_profile
+import remora.composeapp.generated.resources.ic_design
 import remora.composeapp.generated.resources.ic_help
 
 data class NavigationItem(
@@ -29,6 +30,11 @@ private val navigationItems = listOf(
         destination = "Settings",
         label = "Settings",
         iconResource = Res.drawable.ic_settings
+    ),
+    NavigationItem(
+        destination = "Design",
+        label = "Design",
+        iconResource = Res.drawable.ic_design
     ),
     NavigationItem(
         destination = "Profile",

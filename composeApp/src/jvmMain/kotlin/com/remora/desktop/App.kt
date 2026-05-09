@@ -52,17 +52,13 @@ fun App() {
                 }
                 
                 // Main Content
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "$selectedDestination screen",
-                        style = MaterialTheme.typography.headlineMedium
-                    )
+                when (selectedDestination) {
+                    "Dashboard" -> DashboardPage()
+                    "Settings" -> SettingsPage()
+                    "Design" -> DesignPage()
+                    "Profile" -> ProfilePage()
+                    "Help" -> HelpPage()
+                    else -> DashboardPage()
                 }
             }
         }
