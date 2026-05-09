@@ -44,12 +44,18 @@ fun DeviceSelector(
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = selectedDevice ?: "No device",
+                        text = selectedDevice?.model ?: "No device",
                         style = MaterialTheme.typography.labelLarge,
                         color = if (devices.isEmpty()) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface,
                         maxLines = 1
                     )
-                    if (devices.size > 1) {
+                    if (selectedDevice != null) {
+                        Text(
+                            text = "Android ${selectedDevice.osVersion}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    } else if (devices.size > 1) {
                         Text(
                             text = "${devices.size} devices available",
                             style = MaterialTheme.typography.labelSmall,
@@ -64,26 +70,33 @@ fun DeviceSelector(
         DropdownMenu(
             expanded = showDeviceDropdown,
             onDismissRequest = { showDeviceDropdown = false },
-            modifier = Modifier.width(208.dp)
+            modifier = Modifier.width(240.dp)
         ) {
-            devices.forEach { deviceId ->
+            devices.forEach { device ->
                 DropdownMenuItem(
                     text = {
-                        Text(
-                            text = deviceId,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = if (deviceId == selectedDevice) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                        )
+                        Column {
+                            Text(
+                                text = device.model,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (device.serial == selectedDevice?.serial) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "Android ${device.osVersion} • ${device.serial}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
                     },
                     onClick = {
-                        deviceManager.selectedDevice = deviceId
+                        deviceManager.selectedDevice = device
                         showDeviceDropdown = false
                     },
                     leadingIcon = {
                         Icon(
                             painterResource(Res.drawable.ic_mobile),
                             contentDescription = null,
-                            tint = if (deviceId == selectedDevice) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                            tint = if (device.serial == selectedDevice?.serial) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
                         )
                     }
                 )

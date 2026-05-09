@@ -159,9 +159,26 @@ object AdbManager {
     }
 
     /**
+     * Get a property from a specific device
+     */
+    suspend fun getDeviceProperty(serial: String, property: String): String = runCatching {
+        val adbPath = initializeAdb().getOrThrow()
+        val adbExecutable = if (getCurrentPlatform() == "windows") {
+            File(adbPath, "platform-tools/adb.exe")
+        } else {
+            File(adbPath, "platform-tools/adb")
+        }
+        
+        val process = ProcessBuilder(adbExecutable.absolutePath, "-s", serial, "shell", "getprop", property).start()
+        val output = process.inputStream.bufferedReader().use { it.readText() }.trim()
+        process.waitFor()
+        output
+    }.getOrDefault("Unknown")
+
+    /**
      * Get list of connected devices using ADB
      */
-    suspend fun getDevices(): Result<List<String>> = runCatching {
+    suspend fun getDevices(): Result<List<Device>> = runCatching {
         val adbPath = initializeAdb().getOrThrow()
         val adbExecutable = if (getCurrentPlatform() == "windows") {
             File(adbPath, "platform-tools/adb.exe")
@@ -182,9 +199,15 @@ object AdbManager {
             throw RuntimeException("ADB devices command failed with exit code $exitCode. Error: $error")
         }
         
-        output.drop(1) // Drop "List of devices attached"
+        val serials = output.drop(1) // Drop "List of devices attached"
             .map { it.trim() }
             .filter { it.isNotEmpty() && it.contains("\t") }
             .map { it.split("\t")[0] }
+
+        serials.map { serial ->
+            val osVersion = getDeviceProperty(serial, "ro.build.version.release")
+            val model = getDeviceProperty(serial, "ro.product.model")
+            Device(serial, osVersion, model)
+        }
     }
 }

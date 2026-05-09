@@ -41,7 +41,7 @@ fun TerminalPage(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "Device: ${selectedDevice ?: "No device connected"}",
+                    text = "Device: ${selectedDevice?.serial ?: "No device connected"}",
                     style = MaterialTheme.typography.labelMedium,
                     color = Color.Green
                 )
@@ -53,7 +53,7 @@ fun TerminalPage(
                         .background(Color.Black)
                 ) {
                     Text(
-                        text = "$ adb shell\n# Shell ready for ${selectedDevice ?: "unknown"}",
+                        text = "$ adb shell\n# Shell ready for ${selectedDevice?.serial ?: "unknown"}",
                         color = Color.Green,
                         modifier = Modifier.padding(8.dp),
                         style = MaterialTheme.typography.bodySmall

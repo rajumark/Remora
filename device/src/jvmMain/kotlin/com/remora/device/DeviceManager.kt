@@ -1,6 +1,7 @@
 package com.remora.device
 
 import com.remora.adb.AdbManager
+import com.remora.adb.Device
 import androidx.compose.runtime.*
 
 /**
@@ -10,13 +11,13 @@ object DeviceManager {
     /**
      * Observable state for the list of connected devices
      */
-    var connectedDevices by mutableStateOf(emptyList<String>())
+    var connectedDevices by mutableStateOf(emptyList<Device>())
         private set
 
     /**
      * Observable state for the currently selected device
      */
-    var selectedDevice by mutableStateOf<String?>(null)
+    var selectedDevice by mutableStateOf<Device?>(null)
 
     /**
      * Update the list of devices and handle auto-selection
@@ -26,8 +27,11 @@ object DeviceManager {
             if (connectedDevices != devices) {
                 connectedDevices = devices
                 // Auto-selection logic
-                if (selectedDevice == null || !devices.contains(selectedDevice)) {
+                if (selectedDevice == null || !devices.any { it.serial == selectedDevice?.serial }) {
                     selectedDevice = devices.firstOrNull()
+                } else {
+                    // Update the selected device with fresh info if it still exists
+                    selectedDevice = devices.find { it.serial == selectedDevice?.serial }
                 }
             }
         }.onFailure {

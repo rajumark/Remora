@@ -73,8 +73,7 @@ fun App(
                 
                 // Main Content
                 Surface(
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                    color = MaterialTheme.colorScheme.surface
+                    modifier = Modifier.weight(1f).fillMaxHeight()
                 ) {
                     when (selectedDestination) {
                         "Apps" -> AppsPage()

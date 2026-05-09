@@ -54,7 +54,7 @@ fun AppsPage(
                 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Active Device: ", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)
-                    Text(selectedDevice ?: "No device selected", style = MaterialTheme.typography.bodyMedium)
+                    Text(selectedDevice?.model ?: "No device selected", style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }
@@ -79,7 +79,7 @@ fun AppsPage(
         } else {
             // Placeholder for actual app list logic
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Fetching apps for $selectedDevice...", style = MaterialTheme.typography.bodyMedium)
+                Text("Fetching apps for ${selectedDevice.model} (${selectedDevice.serial})...", style = MaterialTheme.typography.bodyMedium)
             }
         }
     }
