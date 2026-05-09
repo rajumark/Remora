@@ -11,13 +11,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.text.selection.SelectionContainer
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 
 @Composable
 fun DesignPage() {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Typography", "Colors", "Buttons", "Cards", "Components")
+    val tabs = listOf("Typography", "Colors", "Buttons", "Cards", "Components", "Debug")
 
     Surface(
         modifier = Modifier
@@ -43,6 +44,7 @@ fun DesignPage() {
             2 -> ButtonsTab()
             3 -> CardsTab()
             4 -> ComponentsTab()
+            5 -> DebugTab()
         }
     }
 }
@@ -343,6 +345,58 @@ fun ComponentsTab() {
             var value by remember { mutableStateOf(0.5f) }
             Slider(value = value, onValueChange = { value = it })
             CopyButton("Slider(value = value, onValueChange = { value = it })")
+        }
+    }
+}
+
+@Composable
+fun DebugTab() {
+    var adbPath by remember { mutableStateOf("Loading...") }
+    var adbVersion by remember { mutableStateOf("Loading...") }
+
+    LaunchedEffect(Unit) {
+        AdbManager.initializeAdb().onSuccess { path ->
+            val platform = AdbManager.getCurrentPlatform()
+            val executable = if (platform == "windows") "platform-tools/adb.exe" else "platform-tools/adb"
+            adbPath = java.io.File(path, executable).absolutePath
+        }.onFailure {
+            adbPath = "Error: ${it.message}"
+        }
+
+        AdbManager.getAdbVersion().onSuccess {
+            adbVersion = it
+        }.onFailure {
+            adbVersion = "Error: ${it.message}"
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text("Debug Information", style = MaterialTheme.typography.headlineSmall)
+
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("ADB Path", style = MaterialTheme.typography.titleMedium)
+                SelectionContainer {
+                    Text(adbPath, style = MaterialTheme.typography.bodyMedium)
+                }
+                CopyButton(adbPath)
+            }
+        }
+
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("ADB Version", style = MaterialTheme.typography.titleMedium)
+                SelectionContainer {
+                    Text(adbVersion, style = MaterialTheme.typography.bodyMedium)
+                }
+                CopyButton(adbVersion)
+            }
         }
     }
 }

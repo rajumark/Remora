@@ -2,9 +2,6 @@ package com.remora.desktop
 
 import java.io.*
 import java.util.zip.ZipInputStream
-import kotlin.io.path.createTempDirectory
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.exists
 
 /**
  * Manages ADB (Android Debug Bridge) functionality including extraction and command execution
@@ -15,7 +12,32 @@ object AdbManager {
     private var isInitialized = false
     
     /**
-     * Initialize ADB by extracting the appropriate platform tools
+     * Get the platform-specific application support directory
+     */
+    private fun getAppSupportDirectory(): File {
+        val os = System.getProperty("os.name").lowercase()
+        val userHome = System.getProperty("user.home")
+        val appName = "Remora"
+        
+        val baseDir = when {
+            os.contains("win") -> {
+                val localAppData = System.getenv("LOCALAPPDATA")
+                if (localAppData != null) File(localAppData) else File(userHome, "AppData/Local")
+            }
+            os.contains("mac") -> {
+                File(userHome, "Library/Application Support")
+            }
+            else -> { // Linux/Unix
+                val xdgDataHome = System.getenv("XDG_DATA_HOME")
+                if (xdgDataHome != null) File(xdgDataHome) else File(userHome, ".local/share")
+            }
+        }
+        
+        return File(baseDir, appName).apply { if (!exists()) mkdirs() }
+    }
+    
+    /**
+     * Initialize ADB by extracting the appropriate platform tools to a persistent directory
      */
     suspend fun initializeAdb(): Result<String> = runCatching {
         if (isInitialized && extractedAdbPath != null) {
@@ -23,24 +45,34 @@ object AdbManager {
         }
         
         val platform = getCurrentPlatform()
+        val appDir = getAppSupportDirectory()
+        val binDir = File(appDir, "bin")
+        val adbExecutableName = if (platform == "windows") "adb.exe" else "adb"
+        val adbFile = File(binDir, "platform-tools/$adbExecutableName")
+        
+        // If ADB already exists, just return the path
+        if (adbFile.exists()) {
+            extractedAdbPath = binDir.absolutePath
+            isInitialized = true
+            return@runCatching extractedAdbPath!!
+        }
+        
+        // Ensure bin directory exists
+        binDir.mkdirs()
+        
         val resourceName = "/adb/platform-tools-latest-$platform.zip"
         
         // Get resource stream
         val resourceStream = this::class.java.getResourceAsStream(resourceName)
             ?: throw IllegalStateException("ADB tools not found for platform: $platform")
         
-        // Create temporary directory for ADB tools
-        val tempDir = createTempDirectory("adb-platform-tools")
-        extractedAdbPath = tempDir.toString()
-        
-        // Extract zip file
+        // Extract zip file to persistent directory
         resourceStream.use { inputStream ->
             ZipInputStream(inputStream).use { zipInputStream ->
                 var entry = zipInputStream.nextEntry
                 while (entry != null) {
                     if (!entry.isDirectory) {
-                        val filePath = tempDir.resolve(entry.name).toString()
-                        val file = File(filePath)
+                        val file = File(binDir, entry.name)
                         file.parentFile.mkdirs()
                         
                         FileOutputStream(file).use { output ->
@@ -57,6 +89,7 @@ object AdbManager {
             }
         }
         
+        extractedAdbPath = binDir.absolutePath
         isInitialized = true
         extractedAdbPath!!
     }
@@ -103,7 +136,7 @@ object AdbManager {
     }
     
     /**
-     * Clean up extracted ADB files
+     * Clean up extracted ADB files (Used only if full reset is needed)
      */
     fun cleanup() {
         extractedAdbPath?.let { path ->

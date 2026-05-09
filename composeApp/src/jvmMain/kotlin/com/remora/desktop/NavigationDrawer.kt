@@ -73,7 +73,7 @@ fun AppNavigationDrawer(
         ) {
             Row(
                 horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
+                 
             ) {
                 Icon(
                     painterResource(Res.drawable.ic_mobile),
