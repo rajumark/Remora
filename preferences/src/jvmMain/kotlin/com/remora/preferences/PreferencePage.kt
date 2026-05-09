@@ -50,11 +50,19 @@ fun PreferencePage(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = "Preferences",
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp)
-                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        TextButton(onClick = onDismissRequest) {
+                            Text("←", style = MaterialTheme.typography.titleLarge)
+                        }
+                        Text(
+                            text = "Preferences",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                    }
                     
                     NavigationDrawerItem(
                         label = { Text("Appearance") },
