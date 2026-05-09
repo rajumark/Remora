@@ -42,8 +42,8 @@ class PreferenceStore {
     }
 
     private fun loadSeedColor(): Long {
-        // Default Material 3 blue seed color
-        return prefs.getLong("seed_color", 0xFF6750A4)
+        // Default to Midnight
+        return prefs.getLong("seed_color", 0xFF1E293B)
     }
 
     /**

@@ -18,20 +18,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import org.koin.compose.koinInject
 
-private val seedColors = listOf(
-    0xFF6750A4, // Purple
-    0xFF006C4C, // Green
-    0xFF984061, // Pink
-    0xFF0061A4, // Blue
-    0xFF7D5260, // Reddish
-    0xFF6B5E40, // Olive
-    0xFF4E6078, // Slate
-    0xFF006A6A, // Teal
-    0xFF625B71, // Gray-ish
-    0xFFA03D2A, // Orange-ish
-    0xFF595B71, // Indigo-ish
-    0xFF006874  // Cyan-ish
-)
+// Accent colors are now defined in AccentColor.kt
 
 @Composable
 fun PreferencePage(
@@ -144,19 +131,62 @@ fun AppearancePreferencePage(preferenceStore: PreferenceStore) {
             )
 
             LazyVerticalGrid(
-                columns = GridCells.Fixed(6),
+                columns = GridCells.Fixed(4),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.height(120.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
-                items(seedColors) { colorValue ->
-                    ColorCircle(
-                        color = Color(colorValue),
-                        selected = selectedSeedColor == colorValue,
-                        onClick = { preferenceStore.setSeedColor(colorValue) }
+                items(accentColors) { accent ->
+                    AccentColorItem(
+                        accent = accent,
+                        selected = selectedSeedColor == accent.color,
+                        onClick = { preferenceStore.setSeedColor(accent.color) }
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun AccentColorItem(
+    accent: AccentColor,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        shape = MaterialTheme.shapes.medium,
+        color = if (selected) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
+        border = if (selected) null else androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(Color(accent.color)),
+                contentAlignment = Alignment.Center
+            ) {
+                if (selected) {
+                    Surface(
+                        modifier = Modifier.size(12.dp),
+                        shape = CircleShape,
+                        color = Color.White,
+                        tonalElevation = 4.dp
+                    ) {}
+                }
+            }
+            Text(
+                text = accent.name,
+                style = MaterialTheme.typography.labelMedium,
+                color = if (selected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }
