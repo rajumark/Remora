@@ -46,8 +46,8 @@ compose.desktop {
     application {
         mainClass = "com.remora.desktop.MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.remora.desktop"
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.AppImage)
+            packageName = "Remora"
             packageVersion = "1.0.0"
         }
     }
