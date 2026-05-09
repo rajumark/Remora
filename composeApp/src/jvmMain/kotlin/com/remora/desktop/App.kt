@@ -23,10 +23,6 @@ import org.jetbrains.compose.resources.DrawableResource
 
 import remora.composeapp.generated.resources.Res
 import remora.composeapp.generated.resources.compose_multiplatform
-import remora.composeapp.generated.resources.ic_menu
-import remora.composeapp.generated.resources.ic_menu_open
-
-@OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
 @Preview
@@ -35,14 +31,15 @@ fun App() {
     var isSidebarVisible by remember { mutableStateOf(true) }
     
     MaterialTheme {
-        Scaffold(
-            modifier = Modifier.fillMaxSize()
-        ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+        ) {
             Row(modifier = Modifier.fillMaxSize()) {
                 // Navigation Menu
                 if (isSidebarVisible) {
                     AppNavigationDrawer(
-                        modifier = Modifier.padding(paddingValues),
                         selectedDestination = selectedDestination,
                         onNavigationItemClick = { destination ->
                             selectedDestination = destination
