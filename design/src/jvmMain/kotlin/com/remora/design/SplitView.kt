@@ -2,17 +2,20 @@ package com.remora.design
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.awt.awtEventOrNull
 import java.awt.Cursor
 
 @Composable
@@ -24,6 +27,8 @@ fun SplitView(
 ) {
     var leftWidthRatio by remember { mutableStateOf(initialLeftWidthRatio) }
     var isDragging by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val totalWidth = maxWidth
@@ -37,7 +42,6 @@ fun SplitView(
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(totalWidth * leftWidthRatio)
-                    .background(MaterialTheme.colorScheme.surface)
             ) {
                 leftContent()
             }
@@ -47,15 +51,7 @@ fun SplitView(
                 modifier = Modifier
                     .width(8.dp)
                     .fillMaxHeight()
-                    .pointerHoverIcon(
-                        PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR))
-                    )
-                    .background(
-                        if (isDragging)
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                        else
-                            MaterialTheme.colorScheme.outlineVariant
-                    )
+                    .hoverable(interactionSource)
                     .pointerInput(Unit) {
                         detectHorizontalDragGestures(
                             onDragStart = {
@@ -67,7 +63,7 @@ fun SplitView(
                             onDragCancel = {
                                 isDragging = false
                             },
-                            onHorizontalDrag = { change, dragAmount ->
+                            onHorizontalDrag = { _, dragAmount ->
                                 val totalWidthPx = with(density) { totalWidth.toPx() }
                                 val ratioChange = dragAmount / totalWidthPx
                                 val newRatio =
@@ -77,28 +73,27 @@ fun SplitView(
                             }
                         )
                     },
-            contentAlignment = Alignment.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .width(4.dp)
-                    .height(40.dp)
-                    .background(
-                        if (isDragging)
-                            MaterialTheme.colorScheme.onPrimary
-                        else
-                            MaterialTheme.colorScheme.onSurfaceVariant,
-                        CircleShape
-                    )
-            )
-        }
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(4.dp)
+                        .height(40.dp)
+                        .background(
+                            when {
+                                isDragging || isHovered -> MaterialTheme.colorScheme.onPrimary
+                                else -> Color.Transparent
+                            },
+                            CircleShape
+                        )
+                )
+            }
 
-        // Right Panel
+            // Right Panel
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(totalWidth * (1f - leftWidthRatio))
-                    .background(MaterialTheme.colorScheme.surface)
             ) {
                 rightContent()
             }

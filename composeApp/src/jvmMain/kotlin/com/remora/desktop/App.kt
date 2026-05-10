@@ -96,7 +96,7 @@ fun App(
                 
                 // Main Content
                 Box(
-                    modifier = Modifier.weight(1f).fillMaxHeight()
+                    modifier = Modifier.weight(1f).fillMaxHeight().background(MaterialTheme.colorScheme.surfaceContainer)
                 ) {
                     when (selectedDestination) {
                         "Apps" -> AppsPage()
