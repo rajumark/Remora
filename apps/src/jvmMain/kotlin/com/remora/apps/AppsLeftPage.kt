@@ -9,6 +9,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -42,29 +44,47 @@ fun AppsLeftPage() {
     var error by remember { mutableStateOf<String?>(null) }
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     var showFilterDialog by remember { mutableStateOf(false) }
+    var isScreenVisible by remember { mutableStateOf(true) }
     
     val filteredPackages = packages.filter { 
         it.contains(searchQuery.text, ignoreCase = true) 
     }
     
-    // Load packages when device or filter changes
-    LaunchedEffect(deviceManager.selectedDevice) {
+    // Function to refresh packages
+    suspend fun refreshPackages() {
         val selectedDevice = deviceManager.selectedDevice
         if (selectedDevice != null) {
-            isLoading = true
-            error = null
             adbManager.getInstalledPackages(
                 serial = selectedDevice.serial,
                 filter = AppsStateManager.currentFilter.adbFlag
             )
-                .onSuccess { 
-                    packages = it 
-                    println("Loaded ${it.size} packages with filter: ${AppsStateManager.currentFilter.displayName}")
+                .onSuccess { newPackages ->
+                    // Smart diffing - only update if list changed
+                    if (packages != newPackages) {
+                        packages = newPackages
+                        // Clear selected package if not found in new list
+                        if (AppsStateManager.selectedPackage != null && 
+                            AppsStateManager.selectedPackage !in newPackages) {
+                            AppsStateManager.selectPackage(null)
+                        }
+                        println("Packages updated: ${newPackages.size} packages")
+                    }
                 }
                 .onFailure { 
-                    error = it.message 
-                    println("Failed to load packages: ${it.message}")
+                    if (error == null) { // Only set error if not already set to avoid flicker
+                        error = it.message
+                    }
                 }
+        }
+    }
+    
+    // Load packages when device or filter changes
+    LaunchedEffect(deviceManager.selectedDevice, AppsStateManager.currentFilter) {
+        val selectedDevice = deviceManager.selectedDevice
+        if (selectedDevice != null) {
+            isLoading = true
+            error = null
+            refreshPackages()
             isLoading = false
         } else {
             packages = emptyList()
@@ -72,25 +92,23 @@ fun AppsLeftPage() {
         }
     }
     
-    // Reload packages when filter changes
-    LaunchedEffect(AppsStateManager.currentFilter) {
-        val selectedDevice = deviceManager.selectedDevice
-        if (selectedDevice != null) {
-            isLoading = true
-            error = null
-            adbManager.getInstalledPackages(
-                serial = selectedDevice.serial,
-                filter = AppsStateManager.currentFilter.adbFlag
-            )
-                .onSuccess { 
-                    packages = it 
-                    println("Reloaded ${it.size} packages with filter: ${AppsStateManager.currentFilter.displayName}")
-                }
-                .onFailure { 
-                    error = it.message 
-                    println("Failed to reload packages: ${it.message}")
-                }
-            isLoading = false
+    // 5-second auto-refresh when screen is visible
+    LaunchedEffect(isScreenVisible, deviceManager.selectedDevice) {
+        if (!isScreenVisible || deviceManager.selectedDevice == null) return@LaunchedEffect
+        
+        while (isScreenVisible && deviceManager.selectedDevice != null) {
+            kotlinx.coroutines.delay(5000) // 5 seconds
+            if (isScreenVisible && deviceManager.selectedDevice != null) {
+                refreshPackages()
+            }
+        }
+    }
+    
+    // Lifecycle callbacks to track screen visibility
+    DisposableEffect(Unit) {
+        isScreenVisible = true
+        onDispose {
+            isScreenVisible = false
         }
     }
     
