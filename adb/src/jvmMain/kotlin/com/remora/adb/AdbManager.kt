@@ -292,4 +292,87 @@ object AdbManager {
             .filter { it.startsWith("package:") }
             .map { it.substringAfter("package:") }
     }
+
+    private fun getAdbExecutable(): File {
+        val adbPath = adbPath ?: throw IllegalStateException("ADB not initialized")
+        val exeName = if (getCurrentPlatform() == "windows") "platform-tools/adb.exe" else "platform-tools/adb"
+        return File(adbPath, exeName)
+    }
+
+    fun startApp(serial: String, packageName: String): Result<Unit> = runCatching {
+        val adb = getAdbExecutable()
+        val process = ProcessBuilder(adb.absolutePath, "-s", serial, "shell", "monkey", "-p", packageName, "-c", "android.intent.category.LAUNCHER", "1").start()
+        process.waitFor()
+    }
+
+    fun forceStopApp(serial: String, packageName: String): Result<Unit> = runCatching {
+        val adb = getAdbExecutable()
+        val process = ProcessBuilder(adb.absolutePath, "-s", serial, "shell", "am", "force-stop", packageName).start()
+        process.waitFor()
+    }
+
+    fun restartApp(serial: String, packageName: String): Result<Unit> = runCatching {
+        forceStopApp(serial, packageName).getOrThrow()
+        startApp(serial, packageName).getOrThrow()
+    }
+
+    fun clearAppData(serial: String, packageName: String): Result<Unit> = runCatching {
+        val adb = getAdbExecutable()
+        val process = ProcessBuilder(adb.absolutePath, "-s", serial, "shell", "pm", "clear", packageName).start()
+        process.waitFor()
+    }
+
+    fun enableDisableApp(serial: String, packageName: String, makeEnable: Boolean): Result<Unit> = runCatching {
+        val adb = getAdbExecutable()
+        val command = if (makeEnable) {
+            listOf(adb.absolutePath, "-s", serial, "shell", "pm", "enable", packageName)
+        } else {
+            listOf(adb.absolutePath, "-s", serial, "shell", "pm", "disable-user", packageName)
+        }
+        val process = ProcessBuilder(command).start()
+        process.waitFor()
+    }
+
+    fun uninstallApp(serial: String, packageName: String): Result<Unit> = runCatching {
+        val adb = getAdbExecutable()
+        val process = ProcessBuilder(adb.absolutePath, "-s", serial, "uninstall", packageName).start()
+        process.waitFor()
+    }
+
+    fun openAppSettings(serial: String, packageName: String): Result<Unit> = runCatching {
+        val adb = getAdbExecutable()
+        val process = ProcessBuilder(adb.absolutePath, "-s", serial, "shell", "am", "start", "-a", "android.settings.APPLICATION_DETAILS_SETTINGS", "-d", "package:$packageName").start()
+        process.waitFor()
+    }
+
+    fun pressHome(serial: String): Result<Unit> = runCatching {
+        val adb = getAdbExecutable()
+        val process = ProcessBuilder(adb.absolutePath, "-s", serial, "shell", "input", "keyevent", "KEYCODE_HOME").start()
+        process.waitFor()
+    }
+
+    fun openUrl(serial: String, url: String): Result<Unit> = runCatching {
+        val adb = getAdbExecutable()
+        val process = ProcessBuilder(adb.absolutePath, "-s", serial, "shell", "am", "start", "-a", "android.intent.action.VIEW", "-d", url).start()
+        process.waitFor()
+    }
+
+    fun downloadApk(serial: String, packageName: String, outputDir: File): Result<Unit> = runCatching {
+        val adb = getAdbExecutable()
+
+        // Get APK path(s)
+        val pathProcess = ProcessBuilder(adb.absolutePath, "-s", serial, "shell", "pm", "path", packageName).start()
+        val paths = pathProcess.inputStream.bufferedReader().use { it.readLines() }
+            .map { it.trim() }
+            .filter { it.startsWith("package:") }
+            .mapNotNull { it.split(":").getOrNull(1)?.trim() }
+        pathProcess.waitFor()
+
+        if (paths.isEmpty()) throw IllegalStateException("No APK path found for $packageName")
+
+        paths.forEach { apkPath ->
+            val pullProcess = ProcessBuilder(adb.absolutePath, "-s", serial, "pull", apkPath, outputDir.absolutePath).start()
+            pullProcess.waitFor()
+        }
+    }
 }

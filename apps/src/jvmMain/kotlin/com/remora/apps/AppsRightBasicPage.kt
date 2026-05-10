@@ -11,6 +11,11 @@ import androidx.compose.ui.unit.dp
 import com.remora.adb.AdbManager
 import com.remora.device.DeviceManager
 import org.koin.compose.koinInject
+import java.awt.Desktop
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
+import java.io.File
+import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -37,24 +42,22 @@ fun AppsRightBasicPage() {
             val info = adbManager.getPackageBasicInfo(device.serial, pkg)
             val items = mutableListOf<BasicInfoItem>()
 
-            info["versionName"]?.let {
-                items.add(BasicInfoItem("Version Name", it))
-            }
-            info["versionCode"]?.let {
-                items.add(BasicInfoItem("Version Code", it))
-            }
-            info["firstInstallTime"]?.let {
-                items.add(BasicInfoItem("Install Time", formatTimestamp(it)))
-            }
-            info["lastUpdateTime"]?.let {
-                items.add(BasicInfoItem("Last Update Time", formatTimestamp(it)))
-            }
+            info["versionName"]?.let { items.add(BasicInfoItem("Version Name", it)) }
+            info["versionCode"]?.let { items.add(BasicInfoItem("Version Code", it)) }
+            info["firstInstallTime"]?.let { items.add(BasicInfoItem("Install Time", formatTimestamp(it))) }
+            info["lastUpdateTime"]?.let { items.add(BasicInfoItem("Last Update Time", formatTimestamp(it))) }
 
             infoItems = items
             isLoading = false
         } else {
             infoItems = emptyList()
         }
+    }
+
+    fun getDeviceAndPkg(): Pair<String, String>? {
+        val device = deviceManager.selectedDevice ?: return null
+        val pkg = selectedPackage ?: return null
+        return device.serial to pkg
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -98,13 +101,95 @@ fun AppsRightBasicPage() {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Row 1: Core app actions
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        OutlineButtonWithText("Open")
-                        OutlineButtonWithText("Stop")
-                        OutlineButtonWithText("Restart")
+                        ActionButton("Open") {
+                            getDeviceAndPkg()?.let { (s, p) -> adbManager.startApp(s, p) }
+                        }
+                        ActionButton("Force Stop") {
+                            getDeviceAndPkg()?.let { (s, p) -> adbManager.forceStopApp(s, p) }
+                        }
+                        ActionButton("Restart") {
+                            getDeviceAndPkg()?.let { (s, p) -> adbManager.restartApp(s, p) }
+                        }
+                        ActionButton("Uninstall") {
+                            getDeviceAndPkg()?.let { (s, p) -> adbManager.uninstallApp(s, p) }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Row 2: Data & state actions
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        ActionButton("Clear Data") {
+                            getDeviceAndPkg()?.let { (s, p) -> adbManager.clearAppData(s, p) }
+                        }
+                        ActionButton("Enable") {
+                            getDeviceAndPkg()?.let { (s, p) -> adbManager.enableDisableApp(s, p, true) }
+                        }
+                        ActionButton("Disable") {
+                            getDeviceAndPkg()?.let { (s, p) -> adbManager.enableDisableApp(s, p, false) }
+                        }
+                        ActionButton("Home") {
+                            deviceManager.selectedDevice?.let { adbManager.pressHome(it.serial) }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Row 3: Info & external actions
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        ActionButton("Copy") {
+                            selectedPackage?.let {
+                                Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(it), null)
+                            }
+                        }
+                        ActionButton("App Info") {
+                            getDeviceAndPkg()?.let { (s, p) -> adbManager.openAppSettings(s, p) }
+                        }
+                        ActionButton("Play Store") {
+                            getDeviceAndPkg()?.let { (s, p) ->
+                                adbManager.openUrl(s, "https://play.google.com/store/apps/details?id=$p")
+                            }
+                        }
+                        ActionButton("Desktop") {
+                            selectedPackage?.let {
+                                if (Desktop.isDesktopSupported()) {
+                                    Desktop.getDesktop().browse(URI("https://play.google.com/store/apps/details?id=$it"))
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Row 4: Download & find
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        ActionButton("Find Online") {
+                            selectedPackage?.let {
+                                if (Desktop.isDesktopSupported()) {
+                                    Desktop.getDesktop().browse(URI("https://www.google.com/search?q=download+$it+APK"))
+                                }
+                            }
+                        }
+                        ActionButton("Download APK") {
+                            getDeviceAndPkg()?.let { (s, p) ->
+                                val downloadDir = File(System.getProperty("user.home"), "Downloads/$p").apply { mkdirs() }
+                                adbManager.downloadApk(s, p, downloadDir)
+                            }
+                        }
                     }
                 }
             }
@@ -113,8 +198,8 @@ fun AppsRightBasicPage() {
 }
 
 @Composable
-private fun OutlineButtonWithText(text: String) {
-    OutlinedButton(onClick = {}) {
+private fun ActionButton(text: String, onClick: () -> Unit) {
+    OutlinedButton(onClick = onClick) {
         Text(text)
     }
 }
