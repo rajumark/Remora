@@ -81,7 +81,7 @@ fun SplitView(
                         .height(40.dp)
                         .background(
                             when {
-                                isDragging || isHovered -> MaterialTheme.colorScheme.onPrimary
+                                isDragging || isHovered -> MaterialTheme.colorScheme.primary
                                 else -> Color.Transparent
                             },
                             CircleShape
