@@ -154,6 +154,14 @@ fun AppsLeftPage() {
                 )
             }
         }
+        
+        // Filter name and count display
+        Text(
+            text = "${AppsStateManager.currentFilter.displayName} (${filteredPackages.size})",
+            modifier = Modifier.padding(start = 32.dp),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         // Content area
         Box(modifier = Modifier.fillMaxSize()) {
             when {
@@ -228,7 +236,7 @@ fun AppsLeftPage() {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         state = listState,
-                        contentPadding = PaddingValues(16.dp),
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         items(filteredPackages) { packageName ->
