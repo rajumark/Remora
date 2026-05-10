@@ -217,6 +217,48 @@ object AdbManager {
     }
 
     /**
+     * Get basic info for a specific package using dumpsys package command
+     */
+    suspend fun getPackageBasicInfo(serial: String, packageName: String): Map<String, String> = runCatching {
+        val adbPath = initializeAdb().getOrThrow()
+        val adbExecutable = if (getCurrentPlatform() == "windows") {
+            File(adbPath, "platform-tools/adb.exe")
+        } else {
+            File(adbPath, "platform-tools/adb")
+        }
+
+        val process = ProcessBuilder(adbExecutable.absolutePath, "-s", serial, "shell", "dumpsys", "package", packageName).start()
+        val output = process.inputStream.bufferedReader().use { it.readText() }
+        process.waitFor()
+
+        val result = mutableMapOf<String, String>()
+
+        output.lineSequence().forEach { line ->
+            val trimmed = line.trim()
+            when {
+                trimmed.startsWith("versionName=") && !trimmed.startsWith("baseVersionName=") -> {
+                    val value = trimmed.substringAfter("versionName=", "Unknown")
+                    if (value.isNotEmpty() && value != "Unknown") result["versionName"] = value
+                }
+                trimmed.startsWith("versionCode=") && trimmed.contains("minSdk=") -> {
+                    val value = trimmed.substringAfter("versionCode=", "").substringBefore(" ").trim()
+                    if (value.isNotEmpty()) result["versionCode"] = value
+                }
+                trimmed.startsWith("firstInstallTime=") -> {
+                    val value = trimmed.substringAfter("firstInstallTime=", "Unknown")
+                    if (value.isNotEmpty() && value != "Unknown") result["firstInstallTime"] = value
+                }
+                trimmed.startsWith("lastUpdateTime=") -> {
+                    val value = trimmed.substringAfter("lastUpdateTime=", "Unknown")
+                    if (value.isNotEmpty() && value != "Unknown") result["lastUpdateTime"] = value
+                }
+            }
+        }
+
+        result
+    }.getOrDefault(emptyMap())
+
+    /**
      * Get list of installed packages from a device using pm list command
      */
     suspend fun getInstalledPackages(serial: String, filter: String = ""): Result<List<String>> = runCatching {
