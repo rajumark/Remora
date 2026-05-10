@@ -13,6 +13,12 @@ object AppsStateManager {
         private set
     
     /**
+     * Current package filter option
+     */
+    var currentFilter by mutableStateOf(PackageFilterOption.ALL_APPS)
+        private set
+    
+    /**
      * Update the selected package
      */
     fun selectPackage(packageName: String?) {
@@ -24,5 +30,12 @@ object AppsStateManager {
      */
     fun clearSelection() {
         selectedPackage = null
+    }
+    
+    /**
+     * Update the package filter
+     */
+    fun setFilter(filter: PackageFilterOption) {
+        currentFilter = filter
     }
 }

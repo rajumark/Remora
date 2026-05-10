@@ -219,7 +219,7 @@ object AdbManager {
     /**
      * Get list of installed packages from a device using pm list command
      */
-    suspend fun getInstalledPackages(serial: String): Result<List<String>> = runCatching {
+    suspend fun getInstalledPackages(serial: String, filter: String = ""): Result<List<String>> = runCatching {
         val adbPath = initializeAdb().getOrThrow()
         val adbExecutable = if (getCurrentPlatform() == "windows") {
             File(adbPath, "platform-tools/adb.exe")
@@ -231,7 +231,13 @@ object AdbManager {
             throw IllegalStateException("ADB executable not found at: ${adbExecutable.absolutePath}")
         }
         
-        val process = ProcessBuilder(adbExecutable.absolutePath, "-s", serial, "shell", "pm", "list", "packages").start()
+        val command = if (filter.isEmpty()) {
+            listOf("shell", "pm", "list", "packages")
+        } else {
+            listOf("shell", "pm", "list", "packages", filter)
+        }
+        
+        val process = ProcessBuilder(adbExecutable.absolutePath, "-s", serial, *command.toTypedArray()).start()
         val output = process.inputStream.bufferedReader().use { it.readLines() }
         val exitCode = process.waitFor()
         

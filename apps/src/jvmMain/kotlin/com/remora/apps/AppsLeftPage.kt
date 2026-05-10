@@ -41,27 +41,56 @@ fun AppsLeftPage() {
     var isLoading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
+    var showFilterDialog by remember { mutableStateOf(false) }
     
     val filteredPackages = packages.filter { 
         it.contains(searchQuery.text, ignoreCase = true) 
     }
     
+    // Load packages when device or filter changes
     LaunchedEffect(deviceManager.selectedDevice) {
         val selectedDevice = deviceManager.selectedDevice
         if (selectedDevice != null) {
             isLoading = true
             error = null
-            adbManager.getInstalledPackages(selectedDevice.serial)
+            adbManager.getInstalledPackages(
+                serial = selectedDevice.serial,
+                filter = AppsStateManager.currentFilter.adbFlag
+            )
                 .onSuccess { 
                     packages = it 
+                    println("Loaded ${it.size} packages with filter: ${AppsStateManager.currentFilter.displayName}")
                 }
                 .onFailure { 
                     error = it.message 
+                    println("Failed to load packages: ${it.message}")
                 }
             isLoading = false
         } else {
             packages = emptyList()
             error = null
+        }
+    }
+    
+    // Reload packages when filter changes
+    LaunchedEffect(AppsStateManager.currentFilter) {
+        val selectedDevice = deviceManager.selectedDevice
+        if (selectedDevice != null) {
+            isLoading = true
+            error = null
+            adbManager.getInstalledPackages(
+                serial = selectedDevice.serial,
+                filter = AppsStateManager.currentFilter.adbFlag
+            )
+                .onSuccess { 
+                    packages = it 
+                    println("Reloaded ${it.size} packages with filter: ${AppsStateManager.currentFilter.displayName}")
+                }
+                .onFailure { 
+                    error = it.message 
+                    println("Failed to reload packages: ${it.message}")
+                }
+            isLoading = false
         }
     }
     
@@ -74,37 +103,57 @@ fun AppsLeftPage() {
                 shape = MaterialTheme.shapes.medium
             )
     ) {
-        // Search field
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
+        // Search field with tune button
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            placeholder = { Text("Search packages...") },
-            singleLine = true,
-            shape = CircleShape,
-            leadingIcon = {
-                Icon(
-                    painterResource(AppsResources.ic_search),
-                    contentDescription = "Search",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
-            trailingIcon = {
-                if (searchQuery.text.isNotEmpty()) {
-                    IconButton(
-                        onClick = { searchQuery = TextFieldValue("") }
-                    ) {
-                        Icon(
-                            painterResource(AppsResources.ic_close),
-                            contentDescription = "Clear search",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Search packages...") },
+                singleLine = true,
+                shape = CircleShape,
+                leadingIcon = {
+                    Icon(
+                        painterResource(AppsResources.ic_search),
+                        contentDescription = "Search",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                trailingIcon = {
+                    if (searchQuery.text.isNotEmpty()) {
+                        IconButton(
+                            onClick = { searchQuery = TextFieldValue("") }
+                        ) {
+                            Icon(
+                                painterResource(AppsResources.ic_close),
+                                contentDescription = "Clear search",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
+            )
+            
+            Spacer(modifier = Modifier.width(8.dp))
+            
+            IconButton(
+                onClick = { 
+                    println("Tune button clicked, showing dialog")
+                    showFilterDialog = true 
+                }
+            ) {
+                Icon(
+                    painterResource(AppsResources.ic_tune),
+                    contentDescription = "Filter options",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
-        )
+        }
         // Content area
         Box(modifier = Modifier.fillMaxSize()) {
             when {
@@ -221,5 +270,23 @@ fun AppsLeftPage() {
                 }
             }
         }
+        
+        // Filter options dialog
+        FilterOptionsDialog(
+            isVisible = showFilterDialog,
+            onDismiss = { 
+                println("Dialog dismissed")
+                showFilterDialog = false 
+            },
+            onFilterSelected = { filter ->
+                println("Filter selected: ${filter.displayName}")
+                AppsStateManager.setFilter(filter)
+                showFilterDialog = false
+            },
+            currentFilter = AppsStateManager.currentFilter
+        )
+        
+        // Debug info
+        println("Current state: showFilterDialog=$showFilterDialog, packages=${packages.size}, currentFilter=${AppsStateManager.currentFilter.displayName}")
     }
 }
