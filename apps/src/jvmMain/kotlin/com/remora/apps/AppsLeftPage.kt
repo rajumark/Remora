@@ -13,16 +13,23 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.remember
 import com.remora.adb.AdbManager
 import com.remora.device.DeviceManager
 import com.remora.apps.AppsResources
 import com.remora.apps.Res
 import org.koin.compose.koinInject
 import org.jetbrains.compose.resources.painterResource
+import java.net.URI
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+import java.awt.Desktop
 
 @Composable
 fun AppsLeftPage() {
@@ -131,12 +138,42 @@ fun AppsLeftPage() {
                     )
                 }
                 filteredPackages.isEmpty() && searchQuery.text.isNotEmpty() -> {
-                    Text(
-                        text = "No packages found for \"${searchQuery.text}\"",
+                    Column(
                         modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "No packages found for \"${searchQuery.text}\"",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            TextButton(
+                                onClick = { searchQuery = TextFieldValue("") }
+                            ) {
+                                Text("Clear filter")
+                            }
+                            TextButton(
+                                onClick = {
+                                    try {
+                                        val encodedQuery = URLEncoder.encode("Android App ${searchQuery.text}", StandardCharsets.UTF_8.toString())
+                                        val searchUrl = "https://www.google.com/search?q=$encodedQuery"
+                                        
+                                        if (Desktop.isDesktopSupported()) {
+                                            Desktop.getDesktop().browse(URI(searchUrl))
+                                        }
+                                    } catch (e: Exception) {
+                                        println("Failed to open browser: ${e.message}")
+                                    }
+                                }
+                            ) {
+                                Text("Find online")
+                            }
+                        }
+                    }
                 }
                 else -> {
                     LazyColumn(
@@ -147,22 +184,25 @@ fun AppsLeftPage() {
                     ) {
                         items(filteredPackages) { packageName ->
                             val isSelected = AppsStateManager.selectedPackage == packageName
-                            Row(
+                            val interactionSource = remember { MutableInteractionSource() }
+                            
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .clip(MaterialTheme.shapes.medium)
                                     .clickable { AppsStateManager.selectPackage(packageName) }
                                     .background(
-                                        if (isSelected) 
+                                        color = if (isSelected) 
                                             MaterialTheme.colorScheme.primaryContainer 
                                         else 
-                                            Color.Transparent
+                                            Color.Transparent,
+                                        shape = MaterialTheme.shapes.medium
                                     )
-                                    .padding(vertical = 4.dp, horizontal = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                    .padding(vertical = 12.dp, horizontal = 16.dp)
                             ) {
                                 Text(
                                     text = packageName,
-                                    modifier = Modifier.weight(1f),
+                                    modifier = Modifier.fillMaxWidth(),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = if (isSelected) 
                                         MaterialTheme.colorScheme.onPrimaryContainer 
@@ -170,14 +210,6 @@ fun AppsLeftPage() {
                                         MaterialTheme.colorScheme.onSurface,
                                     maxLines = 1
                                 )
-                                if (isSelected) {
-                                    Icon(
-                                        painterResource(AppsResources.ic_close),
-                                        contentDescription = "Selected",
-                                        modifier = Modifier.size(16.dp),
-                                        tint = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                }
                             }
                         }
                     }
