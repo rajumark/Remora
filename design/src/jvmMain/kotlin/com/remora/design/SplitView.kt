@@ -11,9 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.awt.awtEventOrNull
-import java.awt.Cursor
-import androidx.compose.ui.input.pointer.PointerInputScope
 
 @Composable
 fun SplitView(
@@ -53,16 +50,6 @@ fun SplitView(
                         else 
                             MaterialTheme.colorScheme.outlineVariant
                     )
-                    .pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                val event = awaitPointerEvent()
-                                event.awtEventOrNull?.let { awtEvent ->
-                                    awtEvent.component?.cursor = Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR)
-                                }
-                            }
-                        }
-                    }
                     .pointerInput(Unit) {
                         detectHorizontalDragGestures(
                             onDragStart = { 

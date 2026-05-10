@@ -95,7 +95,7 @@ fun App(
                 }
                 
                 // Main Content
-                Surface(
+                Box(
                     modifier = Modifier.weight(1f).fillMaxHeight()
                 ) {
                     when (selectedDestination) {
