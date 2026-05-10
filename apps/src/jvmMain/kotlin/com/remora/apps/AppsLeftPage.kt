@@ -11,9 +11,12 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.foundation.clickable
 import com.remora.adb.AdbManager
 import com.remora.device.DeviceManager
 import com.remora.apps.AppsResources
@@ -143,13 +146,39 @@ fun AppsLeftPage() {
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         items(filteredPackages) { packageName ->
-                            Text(
-                                text = packageName,
-                                modifier = Modifier.fillMaxWidth(),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                maxLines = 1
-                            )
+                            val isSelected = AppsStateManager.selectedPackage == packageName
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { AppsStateManager.selectPackage(packageName) }
+                                    .background(
+                                        if (isSelected) 
+                                            MaterialTheme.colorScheme.primaryContainer 
+                                        else 
+                                            Color.Transparent
+                                    )
+                                    .padding(vertical = 4.dp, horizontal = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = packageName,
+                                    modifier = Modifier.weight(1f),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = if (isSelected) 
+                                        MaterialTheme.colorScheme.onPrimaryContainer 
+                                    else 
+                                        MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1
+                                )
+                                if (isSelected) {
+                                    Icon(
+                                        painterResource(AppsResources.ic_close),
+                                        contentDescription = "Selected",
+                                        modifier = Modifier.size(16.dp),
+                                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                }
+                            }
                         }
                     }
                     

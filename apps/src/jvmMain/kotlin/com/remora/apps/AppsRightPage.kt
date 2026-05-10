@@ -4,12 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun AppsRightPage() {
+    val selectedPackage = AppsStateManager.selectedPackage
+    
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -19,6 +21,40 @@ fun AppsRightPage() {
                 shape = MaterialTheme.shapes.medium
             )
     ) {
-        Text("Right Panel")
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            // Selected package display at top left
+            if (selectedPackage != null) {
+                Text(
+                    text = "Selected: $selectedPackage",
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(16.dp))
+            } else {
+                Text(
+                    text = "No package selected",
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            
+            // Rest of the content can go here
+            Text(
+                text = "Package details will appear here",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
