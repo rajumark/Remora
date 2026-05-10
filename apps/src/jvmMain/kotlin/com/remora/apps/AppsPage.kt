@@ -2,7 +2,7 @@ package com.remora.apps
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,30 +21,10 @@ fun AppsPage(
         modifier = Modifier.fillMaxSize(),
         initialLeftWidthRatio = 0.3f,
         leftContent = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 4.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surface,
-                        shape = MaterialTheme.shapes.medium
-                    )
-            ) {
-                Text("Left Panel")
-            }
+            AppsLeftPage()
         },
         rightContent = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 4.dp, top = 16.dp, bottom = 16.dp, end = 16.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surface,
-                        shape = MaterialTheme.shapes.medium
-                    )
-            ) {
-                Text("Right Panel")
-            }
+            AppsRightPage()
         }
     )
 }
