@@ -375,4 +375,87 @@ object AdbManager {
             pullProcess.waitFor()
         }
     }
+
+    /**
+     * Get all permissions for a package using dumpsys package command.
+     * Returns a map with keys: requested_permissions, install_permissions, runtime_permissions
+     */
+    suspend fun getAllRuntimePermissions(serial: String, packageName: String): Map<String, List<PermissionInfo>> = runCatching {
+        val adb = getAdbExecutable()
+        val process = ProcessBuilder(adb.absolutePath, "-s", serial, "shell", "dumpsys", "package", packageName).start()
+        val reader = process.inputStream.bufferedReader()
+        val permissionsMap = mutableMapOf<String, MutableList<PermissionInfo>>()
+        var currentGroup: String? = null
+
+        reader.useLines { lines ->
+            lines.forEach { line ->
+                when {
+                    line.contains("requested permissions:") -> currentGroup = "requested_permissions"
+                    line.contains("install permissions:") -> currentGroup = "install_permissions"
+                    line.contains("runtime permissions:") -> currentGroup = "runtime_permissions"
+                    line.isBlank() -> currentGroup = null
+                    currentGroup != null -> {
+                        val permission = line.extractPermission() ?: return@forEach
+                        val granted = when (currentGroup) {
+                            "runtime_permissions", "install_permissions" -> line.contains("granted=true")
+                            else -> false
+                        }
+                        permissionsMap.getOrPut(currentGroup!!) { mutableListOf() }.add(PermissionInfo(permission, granted))
+                    }
+                }
+            }
+        }
+
+        process.waitFor()
+        permissionsMap
+    }.getOrDefault(emptyMap())
+
+    /**
+     * Grant permissions to a package
+     */
+    fun grantPermissions(serial: String, packageName: String, permissions: List<String>): Result<Unit> = runCatching {
+        val adb = getAdbExecutable()
+        permissions.forEach { permission ->
+            val process = ProcessBuilder(adb.absolutePath, "-s", serial, "shell", "pm", "grant", packageName, permission).start()
+            process.waitFor()
+        }
+    }
+
+    /**
+     * Revoke permissions from a package
+     */
+    fun revokePermissions(serial: String, packageName: String, permissions: List<String>): Result<Unit> = runCatching {
+        val adb = getAdbExecutable()
+        permissions.forEach { permission ->
+            val process = ProcessBuilder(adb.absolutePath, "-s", serial, "shell", "pm", "revoke", packageName, permission).start()
+            process.waitFor()
+        }
+    }
+
+    /**
+     * Extract permission name from a line of dumpsys output
+     */
+    private fun String.extractPermission(): String? {
+        val trimmed = trim()
+        // Lines typically look like: "  android.permission.CAMERA: granted=true"
+        // or: "  android.permission.CAMERA" for requested permissions
+        return when {
+            trimmed.startsWith("android.permission.") -> {
+                trimmed.substringBefore(":").trim()
+            }
+            trimmed.startsWith("com.") || trimmed.startsWith("org.") -> {
+                // Some custom permissions
+                trimmed.substringBefore(":").trim()
+            }
+            else -> null
+        }
+    }
 }
+
+/**
+ * Data class representing a permission with its grant status
+ */
+data class PermissionInfo(
+    val permission: String,
+    val granted: Boolean
+)
