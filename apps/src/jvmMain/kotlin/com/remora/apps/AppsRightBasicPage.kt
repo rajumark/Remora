@@ -95,9 +95,27 @@ fun AppsRightBasicPage() {
                             )
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlineButtonWithText("Open")
+                        OutlineButtonWithText("Stop")
+                        OutlineButtonWithText("Restart")
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun OutlineButtonWithText(text: String) {
+    OutlinedButton(onClick = {}) {
+        Text(text)
     }
 }
 
