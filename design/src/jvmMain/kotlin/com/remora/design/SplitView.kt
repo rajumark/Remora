@@ -21,11 +21,16 @@ import java.awt.Cursor
 @Composable
 fun SplitView(
     modifier: Modifier = Modifier,
-    initialLeftWidthRatio: Float = 0.3f,
+    initialLeftWidthRatio: Float = 0.4f,
     leftContent: @Composable () -> Unit,
     rightContent: @Composable () -> Unit
 ) {
-    var leftWidthRatio by remember { mutableStateOf(initialLeftWidthRatio) }
+    var leftWidthRatio by remember { mutableStateOf(SplitViewPreferences.getStoredRatio()) }
+    
+    // Save ratio when it changes
+    LaunchedEffect(leftWidthRatio) {
+        SplitViewPreferences.storeRatio(leftWidthRatio)
+    }
     var isDragging by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -69,7 +74,10 @@ fun SplitView(
                                 val newRatio =
                                     (leftWidthRatio + ratioChange).coerceIn(0.1f, 0.9f)
 
-                                leftWidthRatio = newRatio
+                                if (newRatio != leftWidthRatio) {
+                                    leftWidthRatio = newRatio
+                                    SplitViewPreferences.storeRatio(newRatio)
+                                }
                             }
                         )
                     },

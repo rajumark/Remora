@@ -19,7 +19,7 @@ fun AppsPage(
 ) {
     SplitView(
         modifier = Modifier.fillMaxSize(),
-        initialLeftWidthRatio = 0.3f,
+        initialLeftWidthRatio = 0.4f,
         leftContent = {
             AppsLeftPage()
         },
