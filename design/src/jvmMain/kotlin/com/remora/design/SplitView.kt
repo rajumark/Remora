@@ -9,8 +9,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import java.awt.Cursor
 
 @Composable
 fun SplitView(
@@ -44,28 +47,32 @@ fun SplitView(
                 modifier = Modifier
                     .width(8.dp)
                     .fillMaxHeight()
+                    .pointerHoverIcon(
+                        PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR))
+                    )
                     .background(
-                        if (isDragging) 
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.8f) 
-                        else 
+                        if (isDragging)
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                        else
                             MaterialTheme.colorScheme.outlineVariant
                     )
                     .pointerInput(Unit) {
                         detectHorizontalDragGestures(
-                            onDragStart = { 
+                            onDragStart = {
                                 isDragging = true
                             },
-                            onDragEnd = { 
+                            onDragEnd = {
                                 isDragging = false
                             },
-                            onDragCancel = { 
+                            onDragCancel = {
                                 isDragging = false
                             },
                             onHorizontalDrag = { change, dragAmount ->
-                                // Calculate the new ratio based on the total width
                                 val totalWidthPx = with(density) { totalWidth.toPx() }
                                 val ratioChange = dragAmount / totalWidthPx
-                                val newRatio = (leftWidthRatio + ratioChange).coerceIn(0.1f, 0.9f)
+                                val newRatio =
+                                    (leftWidthRatio + ratioChange).coerceIn(0.1f, 0.9f)
+
                                 leftWidthRatio = newRatio
                             }
                         )
