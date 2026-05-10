@@ -22,13 +22,12 @@ fun AppsPage(
     SplitView(
         modifier = Modifier.fillMaxSize(),
         initialLeftWidthRatio = 0.4f,
+        isRightVisible = isRightPageVisible,
         leftContent = {
             AppsLeftPage()
         },
         rightContent = {
-            if (isRightPageVisible) {
-                AppsRightPage()
-            }
+            AppsRightPage()
         }
     )
 }

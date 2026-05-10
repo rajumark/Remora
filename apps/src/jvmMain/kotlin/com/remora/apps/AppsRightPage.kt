@@ -36,11 +36,13 @@ fun AppsRightPage() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (selectedPackage != null) "Selected: $selectedPackage" else "No package selected",
+                    text = selectedPackage ?: "No package selected",
+                    modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (selectedPackage != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (selectedPackage != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1
                 )
-                
+
                 IconButton(
                     onClick = {
                         AppsStateManager.selectPackage(null)
