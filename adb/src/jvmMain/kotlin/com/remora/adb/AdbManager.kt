@@ -387,26 +387,55 @@ object AdbManager {
         val permissionsMap = mutableMapOf<String, MutableList<PermissionInfo>>()
         var currentGroup: String? = null
 
+        println("=== DEBUG: Parsing permissions for $packageName ===")
+
         reader.useLines { lines ->
             lines.forEach { line ->
                 when {
-                    line.contains("requested permissions:") -> currentGroup = "requested_permissions"
-                    line.contains("install permissions:") -> currentGroup = "install_permissions"
-                    line.contains("runtime permissions:") -> currentGroup = "runtime_permissions"
-                    line.isBlank() -> currentGroup = null
+                    line.contains("requested permissions:") -> {
+                        currentGroup = "requested_permissions"
+                        println(">>> ENTERING REQUESTED PERMISSIONS SECTION")
+                    }
+                    line.contains("install permissions:") -> {
+                        currentGroup = "install_permissions"
+                        println(">>> ENTERING INSTALL PERMISSIONS SECTION")
+                    }
+                    line.contains("runtime permissions:") -> {
+                        currentGroup = "runtime_permissions"
+                        println(">>> ENTERING RUNTIME PERMISSIONS SECTION")
+                    }
+                    line.isBlank() -> {
+                        currentGroup = null
+                        println(">>> EXITING PERMISSION SECTION")
+                    }
                     currentGroup != null -> {
-                        val permission = line.extractPermission() ?: return@forEach
-                        val granted = when (currentGroup) {
-                            "runtime_permissions", "install_permissions" -> line.contains("granted=true")
-                            else -> false
+                        val permission = line.extractPermission()
+                        if (permission != null) {
+                            val granted = when (currentGroup) {
+                                "runtime_permissions", "install_permissions" -> line.contains("granted=true")
+                                else -> false
+                            }
+                            permissionsMap.getOrPut(currentGroup!!) { mutableListOf() }.add(PermissionInfo(permission, granted))
+                            println(">>> EXTRACTED [$currentGroup]: $permission (granted: $granted)")
+                        } else {
+                            // Only log non-empty lines that were skipped for debugging
+                            if (line.trim().isNotEmpty()) {
+                                println(">>> SKIPPED [$currentGroup]: $line")
+                            }
                         }
-                        permissionsMap.getOrPut(currentGroup!!) { mutableListOf() }.add(PermissionInfo(permission, granted))
                     }
                 }
             }
         }
 
         process.waitFor()
+        
+        println("=== SUMMARY ===")
+        println("Runtime permissions: ${permissionsMap["runtime_permissions"]?.size ?: 0}")
+        println("Install permissions: ${permissionsMap["install_permissions"]?.size ?: 0}")
+        println("Requested permissions: ${permissionsMap["requested_permissions"]?.size ?: 0}")
+        println("=== END DEBUG ===")
+        
         permissionsMap
     }.getOrDefault(emptyMap())
 
@@ -437,15 +466,33 @@ object AdbManager {
      */
     private fun String.extractPermission(): String? {
         val trimmed = trim()
+        
+        // Skip section headers and empty lines
+        if (trimmed.contains("permissions:") || trimmed.isEmpty()) {
+            return null
+        }
+        
         // Lines typically look like: "  android.permission.CAMERA: granted=true"
         // or: "  android.permission.CAMERA" for requested permissions
         return when {
+            // Standard Android permissions
             trimmed.startsWith("android.permission.") -> {
                 trimmed.substringBefore(":").trim()
             }
-            trimmed.startsWith("com.") || trimmed.startsWith("org.") -> {
-                // Some custom permissions
-                trimmed.substringBefore(":").trim()
+            // Custom permissions - but exclude activities/services/receivers
+            (trimmed.startsWith("com.") || trimmed.startsWith("org.")) -> {
+                // Exclude activities, services, receivers, and other components
+                val isActivity = trimmed.contains("Activity")
+                val isService = trimmed.contains("Service")
+                val isReceiver = trimmed.contains("Receiver")
+                val isProvider = trimmed.contains("Provider")
+                val isComponent = isActivity || isService || isReceiver || isProvider
+                
+                if (!isComponent) {
+                    trimmed.substringBefore(":").trim()
+                } else {
+                    null
+                }
             }
             else -> null
         }
