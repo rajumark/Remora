@@ -24,7 +24,7 @@ fun AppsPage(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 0.dp)
+                    .padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 4.dp)
                     .background(
                         color = MaterialTheme.colorScheme.surface,
                         shape = MaterialTheme.shapes.medium
@@ -37,7 +37,7 @@ fun AppsPage(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = 0.dp, top = 16.dp, bottom = 16.dp, end = 16.dp)
+                    .padding(start = 4.dp, top = 16.dp, bottom = 16.dp, end = 16.dp)
                     .background(
                         color = MaterialTheme.colorScheme.surface,
                         shape = MaterialTheme.shapes.medium
