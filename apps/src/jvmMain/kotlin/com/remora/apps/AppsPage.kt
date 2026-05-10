@@ -17,6 +17,8 @@ fun AppsPage(
     adbManager: AdbManager = koinInject(),
     deviceManager: DeviceManager = koinInject()
 ) {
+    val isRightPageVisible = AppsStateManager.isRightPageVisible
+    
     SplitView(
         modifier = Modifier.fillMaxSize(),
         initialLeftWidthRatio = 0.4f,
@@ -24,7 +26,9 @@ fun AppsPage(
             AppsLeftPage()
         },
         rightContent = {
-            AppsRightPage()
+            if (isRightPageVisible) {
+                AppsRightPage()
+            }
         }
     )
 }

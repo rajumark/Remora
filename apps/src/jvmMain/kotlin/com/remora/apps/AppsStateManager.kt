@@ -19,10 +19,19 @@ object AppsStateManager {
         private set
     
     /**
+     * Whether AppsRightPage should be visible
+     */
+    var isRightPageVisible by mutableStateOf(false)
+        private set
+    
+    /**
      * Update the selected package
      */
     fun selectPackage(packageName: String?) {
         selectedPackage = packageName
+        if (packageName != null) {
+            isRightPageVisible = true
+        }
     }
     
     /**
@@ -37,5 +46,12 @@ object AppsStateManager {
      */
     fun setFilter(filter: PackageFilterOption) {
         currentFilter = filter
+    }
+    
+    /**
+     * Set right page visibility
+     */
+    fun toggleRightPageVisibility(visible: Boolean) {
+        isRightPageVisible = visible
     }
 }

@@ -5,8 +5,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.remora.apps.AppsResources
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun AppsRightPage() {
@@ -26,28 +29,35 @@ fun AppsRightPage() {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Selected package display at top left
-            if (selectedPackage != null) {
+            // Header with close button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = "Selected: $selectedPackage",
-                    modifier = Modifier.fillMaxWidth(),
+                    text = if (selectedPackage != null) "Selected: $selectedPackage" else "No package selected",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = if (selectedPackage != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(16.dp))
-            } else {
-                Text(
-                    text = "No package selected",
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(16.dp))
+                
+                IconButton(
+                    onClick = {
+                        AppsStateManager.selectPackage(null)
+                        AppsStateManager.toggleRightPageVisibility(false)
+                    }
+                ) {
+                    Icon(
+                        painterResource(AppsResources.ic_close),
+                        contentDescription = "Close",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(16.dp))
             
             // Rest of the content can go here
             Text(
