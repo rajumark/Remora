@@ -53,9 +53,6 @@ compose.desktop {
             val iconsRoot = project.file("../desktop-icons")
             macOS {
                 iconFile.set(iconsRoot.resolve("icon-mac.icns"))
-                // Differentiate package names for Intel vs Apple Silicon
-                val arch = if (System.getProperty("os.arch").contains("aarch64")) "AppleSilicon" else "Intel"
-                packageBaseName = "Remora-${arch}"
             }
             windows {
                 iconFile.set(iconsRoot.resolve("icon-windows.ico"))
