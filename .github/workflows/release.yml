@@ -68,32 +68,32 @@ jobs:
   #         path: composeApp/build/compose/binaries/main/appimage/*.AppImage
   #         retention-days: 30
 
-  # build-mac-intel:
-  #   name: Build Mac DMG (Intel)
-  #   if: contains(github.event.head_commit.message, '#go')
-  #   runs-on: macos-13
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+  build-mac-intel:
+    name: Build Mac DMG (Intel)
+    if: contains(github.event.head_commit.message, '#go')
+    runs-on: macos-13
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Set up JDK
-  #       uses: actions/setup-java@v4
-  #       with:
-  #         distribution: 'temurin'
-  #         java-version: '17'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-  #     - name: Grant execute permission for gradlew
-  #       run: chmod +x gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-  #     - name: Build Mac DMG (Intel)
-  #       run: ./gradlew composeApp:packageDmg
+      - name: Build Mac DMG (Intel)
+        run: ./gradlew composeApp:packageDmg
 
-  #     - name: Upload Mac DMG (Intel)
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: Remora-Mac-Intel-DMG
-  #         path: composeApp/build/compose/binaries/main/dmg/*.dmg
-  #         retention-days: 30
+      - name: Upload Mac DMG (Intel)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Remora-Mac-Intel-DMG
+          path: composeApp/build/compose/binaries/main/dmg/*.dmg
+          retention-days: 30
 
   build-mac-apple-silicon:
     name: Build Mac DMG (Apple Silicon)
@@ -124,7 +124,7 @@ jobs:
 
   create-release:
     name: Create Release
-    needs: [build-mac-apple-silicon]
+    needs: [build-mac-intel, build-mac-apple-silicon]
     if: contains(github.event.head_commit.message, '#go')
     runs-on: ubuntu-latest
     steps:
@@ -159,6 +159,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
+            ./artifacts/Remora-Mac-Intel-DMG/*.dmg
             ./artifacts/Remora-Mac-AppleSilicon-DMG/*.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}

@@ -49,6 +49,23 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.AppImage)
             packageName = "Remora"
             packageVersion = "1.0.0"
+            
+            val iconsRoot = project.file("../desktop-icons")
+            macOS {
+                iconFile.set(iconsRoot.resolve("icon-mac.icns"))
+                // Differentiate package names for Intel vs Apple Silicon
+                val arch = if (System.getProperty("os.arch").contains("aarch64")) "AppleSilicon" else "Intel"
+                packageBaseName = "Remora-${arch}"
+            }
+            windows {
+                iconFile.set(iconsRoot.resolve("icon-windows.ico"))
+                menuGroup = "Remora"
+                installationPath = "C:\\Program Files\\Remora"
+                upgradeUuid = "8f3d4c92-1b3a-7c8e-2a14-90f75b83d1ce"
+            }
+            linux {
+                iconFile.set(iconsRoot.resolve("icon-linux.png"))
+            }
         }
     }
 }
