@@ -87,6 +87,7 @@ Text(
 2. Never create custom composables for standard UI elements
 3. Use default MaterialTheme values for colors, typography, and shapes
 4. Keep UI simple and consistent with Material Design guidelines
+5. **NEVER use emojis** - Use text-based alternatives or drawable resources from the download folder instead
 
 ---
 

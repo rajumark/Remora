@@ -6,8 +6,8 @@ object ADBSettings {
     fun getSettingsList(): List<SettingsBox> {
         try {
             val pinList = SettingsPinDatabase.getPinList()
-            return listSettings.map {
-                SettingsBox(it, pinList.contains(it))
+            return SettingsDataList.map {
+                SettingsBox(it, pinList.contains(it.id))
             }.sortedByDescending { it.isPined }
         } catch (e: Exception) {
             return emptyList()
@@ -37,6 +37,6 @@ object ADBSettings {
 }
 
 data class SettingsBox(
-    val intent: String,
+    val setting: SettingItem,
     val isPined: Boolean
 )
