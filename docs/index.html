@@ -252,6 +252,17 @@
             margin-bottom: 32px;
         }
 
+        .md-hero__tagline {
+            font-family: var(--md-sys-typescale-headline-large-font);
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 24px;
+            letter-spacing: 0.15px;
+            color: var(--md-sys-color-primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
         .md-hero__title {
             font-family: var(--md-sys-typescale-display-large-font);
             font-size: clamp(36px, 5vw, 57px);
@@ -271,6 +282,30 @@
             color: var(--md-sys-color-on-surface-variant);
             max-width: 600px;
             margin: 0 auto;
+        }
+
+        .md-chip-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .md-chip {
+            display: inline-flex;
+            align-items: center;
+            height: 32px;
+            padding: 0 16px;
+            border-radius: var(--md-sys-shape-corner-full);
+            background: var(--md-sys-color-surface-variant);
+            color: var(--md-sys-color-on-surface-variant);
+            font-family: var(--md-sys-typescale-label-large-font);
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 16px;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--md-sys-color-outline-variant);
         }
 
         /* ============================================
@@ -341,6 +376,58 @@
             fill: currentColor;
         }
 
+        .md-button--expressive {
+            height: 56px;
+            padding: 0 32px;
+            font-size: 16px;
+            line-height: 24px;
+            letter-spacing: 0.15px;
+        }
+
+        .md-button--expressive .md-button__icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* ============================================
+           MD3 RIPPLE & DIVIDER
+           ============================================ */
+        .md-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .md-ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .md-ripple:active::after {
+            animation: md-ripple-spread 0.4s ease-out forwards;
+        }
+
+        @keyframes md-ripple-spread {
+            0% { width: 0; height: 0; opacity: 0.6; }
+            100% { width: 300px; height: 300px; opacity: 0; }
+        }
+
+        .md-divider {
+            width: 100%;
+            max-width: 600px;
+            height: 1px;
+            background: var(--md-sys-color-outline-variant);
+            margin: 32px 0;
+        }
+
         /* ============================================
            MD3 FEATURE CARDS (Elevated Surface)
            ============================================ */
@@ -407,6 +494,61 @@
         }
 
         /* ============================================
+           MD3 TOOLTIP
+           ============================================ */
+        .md-tooltip-wrapper {
+            position: relative;
+            display: inline-flex;
+        }
+
+        .md-tooltip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            padding: 4px 12px;
+            border-radius: var(--md-sys-shape-corner-small);
+            background: var(--md-sys-color-surface-variant);
+            color: var(--md-sys-color-on-surface);
+            font-family: var(--md-sys-typescale-label-large-font);
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 16px;
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
+                        transform var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+            z-index: 10;
+        }
+
+        .md-tooltip-wrapper:hover .md-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* ============================================
+           MD3 BADGE
+           ============================================ */
+        .md-badge {
+            display: inline-flex;
+            align-items: center;
+            height: 20px;
+            padding: 0 8px;
+            border-radius: var(--md-sys-shape-corner-full);
+            background: var(--md-sys-color-tertiary-container);
+            color: var(--md-sys-color-on-tertiary-container);
+            font-family: var(--md-sys-typescale-label-large-font);
+            font-size: 11px;
+            font-weight: 500;
+            line-height: 16px;
+            letter-spacing: 0.5px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        /* ============================================
            MD3 RESPONSIVE
            ============================================ */
         @media (max-width: 768px) {
@@ -439,43 +581,54 @@
     <!-- MD3 Top App Bar -->
     <header class="md-top-app-bar">
         <div class="md-top-app-bar__leading">
-            <span class="md-top-app-bar__logo">Remora</span>
-            <nav class="md-top-app-bar__nav-links">
-                <a href="#features" class="md-nav-link">Features</a>
-                <a href="https://github.com/rajumark/Remora" class="md-nav-link">GitHub</a>
-            </nav>
+            <span class="md-top-app-bar__logo">Remora<span class="md-badge">v1.0</span></span>
         </div>
-        <button class="md-icon-button" onclick="toggleTheme()" aria-label="Toggle theme">
-            <svg class="md-icon-button__icon" viewBox="0 0 24 24" id="theme-icon">
-                <!-- Default: Moon icon -->
-                <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
-            </svg>
-        </button>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="md-tooltip-wrapper">
+                <a href="https://github.com/rajumark/Remora" class="md-icon-button md-ripple" aria-label="GitHub" target="_blank" rel="noopener">
+                    <svg class="md-icon-button__icon" viewBox="0 0 24 24">
+                        <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.393-3.369-1.393-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                    </svg>
+                </a>
+                <span class="md-tooltip">GitHub</span>
+            </div>
+            <div class="md-tooltip-wrapper">
+                <button class="md-icon-button md-ripple" onclick="toggleTheme()" aria-label="Toggle theme">
+                    <svg class="md-icon-button__icon" viewBox="0 0 24 24" id="theme-icon">
+                        <!-- Default: Moon icon -->
+                        <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+                    </svg>
+                </button>
+                <span class="md-tooltip">Theme</span>
+            </div>
     </header>
 
     <!-- MD3 Main Content -->
     <main class="md-main-content">
         <!-- MD3 Hero Section -->
         <section class="md-hero">
-            <h1 class="md-hero__title">Android Development Bridge</h1>
+            <h1 class="md-hero__title">Remora</h1>
             <p class="md-hero__subtitle">
-                Advanced development tool for Android developers who need efficient device management,
-                debugging capabilities, and seamless integration with modern workflows.
+                Desktop toolkit for Android developers.
             </p>
+            <div class="md-chip-group">
+                <span class="md-chip">Open Source</span>
+                <span class="md-chip">Cross-Platform</span>
+                <span class="md-chip">Free</span>
+            </div>
         </section>
 
         <!-- MD3 Button Group -->
         <div class="md-button-group">
-            <a href="https://github.com/rajumark/Remora/releases" class="md-button md-button--filled">
+            <a href="https://github.com/rajumark/Remora/releases" class="md-button md-button--filled md-button--expressive md-ripple">
                 <svg class="md-button__icon" viewBox="0 0 24 24">
                     <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
                 </svg>
                 Download
             </a>
-            <a href="https://github.com/rajumark/Remora" class="md-button md-button--outlined">
-                View on GitHub
-            </a>
         </div>
+
+        <div class="md-divider"></div>
 
         <!-- MD3 Feature Grid -->
         <div class="md-feature-grid" id="features">
