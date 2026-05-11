@@ -5,26 +5,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Remora - Android Development Bridge</title>
     <style>
+        /* ============================================
+           MATERIAL DESIGN 3 (MD3) DESIGN TOKENS
+           Pure CSS - No external libraries
+           ============================================ */
+
         :root {
-            --bg-primary: #ffffff;
-            --text-primary: #202124;
-            --text-secondary: #5f6368;
-            --accent: #1a73e8;
-            --accent-hover: #1765cc;
-            --divider: #dadce0;
-            --surface: #f8f9fa;
+            /* Primary palette */
+            --md-sys-color-primary: #6750A4;
+            --md-sys-color-on-primary: #FFFFFF;
+            --md-sys-color-primary-container: #EADDFF;
+            --md-sys-color-on-primary-container: #21005D;
+
+            /* Secondary palette */
+            --md-sys-color-secondary: #625B71;
+            --md-sys-color-on-secondary: #FFFFFF;
+            --md-sys-color-secondary-container: #E8DEF8;
+            --md-sys-color-on-secondary-container: #1D192B;
+
+            /* Tertiary palette */
+            --md-sys-color-tertiary: #7D5260;
+            --md-sys-color-on-tertiary: #FFFFFF;
+            --md-sys-color-tertiary-container: #FFD8E4;
+            --md-sys-color-on-tertiary-container: #31111D;
+
+            /* Surface palette */
+            --md-sys-color-surface: #FFFBFE;
+            --md-sys-color-surface-variant: #E7E0EC;
+            --md-sys-color-on-surface: #1C1B1F;
+            --md-sys-color-on-surface-variant: #49454F;
+
+            /* Background */
+            --md-sys-color-background: #FFFBFE;
+            --md-sys-color-on-background: #1C1B1F;
+
+            /* Error */
+            --md-sys-color-error: #B3261E;
+            --md-sys-color-on-error: #FFFFFF;
+
+            /* Elevation surface tints (light) */
+            --md-sys-elevation-surface-1: linear-gradient(0deg, rgba(103, 80, 164, 0.05), rgba(103, 80, 164, 0.05)), #FFFBFE;
+            --md-sys-elevation-surface-2: linear-gradient(0deg, rgba(103, 80, 164, 0.08), rgba(103, 80, 164, 0.08)), #FFFBFE;
+            --md-sys-elevation-surface-3: linear-gradient(0deg, rgba(103, 80, 164, 0.11), rgba(103, 80, 164, 0.11)), #FFFBFE;
+
+            /* Outline */
+            --md-sys-color-outline: #79747E;
+            --md-sys-color-outline-variant: #CAC4D0;
+
+            /* Typography */
+            --md-sys-typescale-display-large-font: 'Roboto', system-ui, -apple-system, sans-serif;
+            --md-sys-typescale-headline-large-font: 'Roboto', system-ui, -apple-system, sans-serif;
+            --md-sys-typescale-title-large-font: 'Roboto', system-ui, -apple-system, sans-serif;
+            --md-sys-typescale-body-large-font: 'Roboto', system-ui, -apple-system, sans-serif;
+            --md-sys-typescale-label-large-font: 'Roboto', system-ui, -apple-system, sans-serif;
+
+            /* Shape */
+            --md-sys-shape-corner-small: 4px;
+            --md-sys-shape-corner-medium: 8px;
+            --md-sys-shape-corner-large: 16px;
+            --md-sys-shape-corner-extra-large: 28px;
+            --md-sys-shape-corner-full: 9999px;
+
+            /* Motion */
+            --md-sys-motion-duration-short: 200ms;
+            --md-sys-motion-duration-medium: 300ms;
+            --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
         }
 
         [data-theme="dark"] {
-            --bg-primary: #202124;
-            --text-primary: #e8eaed;
-            --text-secondary: #9aa0a6;
-            --accent: #8ab4f8;
-            --accent-hover: #669df6;
-            --divider: #3c4043;
-            --surface: #292a2d;
+            /* Primary palette (dark) */
+            --md-sys-color-primary: #D0BCFF;
+            --md-sys-color-on-primary: #381E72;
+            --md-sys-color-primary-container: #4F378B;
+            --md-sys-color-on-primary-container: #EADDFF;
+
+            /* Secondary palette (dark) */
+            --md-sys-color-secondary: #CCC2DC;
+            --md-sys-color-on-secondary: #332D41;
+            --md-sys-color-secondary-container: #4A4458;
+            --md-sys-color-on-secondary-container: #E8DEF8;
+
+            /* Tertiary palette (dark) */
+            --md-sys-color-tertiary: #EFB8C8;
+            --md-sys-color-on-tertiary: #492532;
+            --md-sys-color-tertiary-container: #633B48;
+            --md-sys-color-on-tertiary-container: #FFD8E4;
+
+            /* Surface palette (dark) */
+            --md-sys-color-surface: #1C1B1F;
+            --md-sys-color-surface-variant: #49454F;
+            --md-sys-color-on-surface: #E6E1E5;
+            --md-sys-color-on-surface-variant: #CAC4D0;
+
+            /* Background (dark) */
+            --md-sys-color-background: #1C1B1F;
+            --md-sys-color-on-background: #E6E1E5;
+
+            /* Error (dark) */
+            --md-sys-color-error: #F2B8B5;
+            --md-sys-color-on-error: #601410;
+
+            /* Elevation surface tints (dark) - with primary color overlay */
+            --md-sys-elevation-surface-1: linear-gradient(0deg, rgba(208, 188, 255, 0.05), rgba(208, 188, 255, 0.05)), #1C1B1F;
+            --md-sys-elevation-surface-2: linear-gradient(0deg, rgba(208, 188, 255, 0.08), rgba(208, 188, 255, 0.08)), #1C1B1F;
+            --md-sys-elevation-surface-3: linear-gradient(0deg, rgba(208, 188, 255, 0.11), rgba(208, 188, 255, 0.11)), #1C1B1F;
+
+            /* Outline (dark) */
+            --md-sys-color-outline: #938F99;
+            --md-sys-color-outline-variant: #49454F;
         }
 
+        /* ============================================
+           BASE STYLES
+           ============================================ */
         * {
             margin: 0;
             padding: 0;
@@ -32,15 +125,21 @@
         }
 
         body {
-            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            font-family: var(--md-sys-typescale-body-large-font);
+            background: var(--md-sys-color-background);
+            color: var(--md-sys-color-on-surface);
             height: 100vh;
             overflow: hidden;
-            transition: background-color 0.2s ease, color 0.2s ease;
+            transition: background var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-standard),
+                        color var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-standard);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        .nav {
+        /* ============================================
+           MD3 TOP APP BAR
+           ============================================ */
+        .md-top-app-bar {
             position: fixed;
             top: 0;
             left: 0;
@@ -49,63 +148,92 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
-            border-bottom: 1px solid var(--divider);
-            background: var(--bg-primary);
+            padding: 0 16px;
+            background: var(--md-sys-elevation-surface-2);
             z-index: 1000;
+            transition: background var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-standard);
         }
 
-        .nav-left {
+        .md-top-app-bar__leading {
             display: flex;
             align-items: center;
             gap: 16px;
         }
 
-        .logo {
+        .md-top-app-bar__logo {
+            font-family: var(--md-sys-typescale-title-large-font);
             font-size: 22px;
-            font-weight: 400;
-            color: var(--text-primary);
-            letter-spacing: -0.5px;
+            font-weight: 500;
+            color: var(--md-sys-color-on-surface);
+            letter-spacing: 0;
+            line-height: 28px;
         }
 
-        .nav-links {
+        .md-top-app-bar__nav-links {
             display: flex;
-            gap: 24px;
+            gap: 8px;
         }
 
-        .nav-link {
-            color: var(--text-secondary);
+        .md-nav-link {
+            font-family: var(--md-sys-typescale-label-large-font);
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            letter-spacing: 0.1px;
+            color: var(--md-sys-color-on-surface-variant);
             text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: color 0.2s ease;
-        }
-
-        .nav-link:hover {
-            color: var(--text-primary);
-        }
-
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
             padding: 8px 12px;
-            border-radius: 4px;
-            transition: background-color 0.2s ease, color 0.2s ease;
-            display: flex;
+            border-radius: var(--md-sys-shape-corner-full);
+            transition: background var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
+                        color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+        }
+
+        .md-nav-link:hover {
+            background: rgba(var(--md-sys-color-on-surface-rgb, 28, 27, 31), 0.08);
+            color: var(--md-sys-color-on-surface);
+        }
+
+        [data-theme="dark"] .md-nav-link:hover {
+            background: rgba(230, 225, 229, 0.08);
+        }
+
+        /* ============================================
+           MD3 ICON BUTTON
+           ============================================ */
+        .md-icon-button {
+            display: inline-flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: var(--md-sys-shape-corner-full);
+            background: transparent;
+            color: var(--md-sys-color-on-surface-variant);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: background var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
         }
 
-        .theme-toggle:hover {
-            background: var(--surface);
-            color: var(--text-primary);
+        .md-icon-button:hover {
+            background: rgba(var(--md-sys-color-on-surface-rgb, 28, 27, 31), 0.08);
         }
 
-        .main-content {
+        [data-theme="dark"] .md-icon-button:hover {
+            background: rgba(230, 225, 229, 0.08);
+        }
+
+        .md-icon-button__icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* ============================================
+           MD3 MAIN CONTENT
+           ============================================ */
+        .md-main-content {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -116,242 +244,316 @@
             margin: 0 auto;
         }
 
-        .hero {
+        /* ============================================
+           MD3 HERO SECTION
+           ============================================ */
+        .md-hero {
             text-align: center;
-            margin-bottom: 48px;
-        }
-
-        .hero-title {
-            font-size: 56px;
-            font-weight: 300;
-            color: var(--text-primary);
-            margin-bottom: 16px;
-            letter-spacing: -1.5px;
-            line-height: 1.2;
-        }
-
-        .hero-subtitle {
-            font-size: 20px;
-            color: var(--text-secondary);
-            font-weight: 400;
             margin-bottom: 32px;
+        }
+
+        .md-hero__title {
+            font-family: var(--md-sys-typescale-display-large-font);
+            font-size: clamp(36px, 5vw, 57px);
+            font-weight: 400;
+            line-height: 64px;
+            letter-spacing: -0.25px;
+            color: var(--md-sys-color-on-surface);
+            margin-bottom: 16px;
+        }
+
+        .md-hero__subtitle {
+            font-family: var(--md-sys-typescale-body-large-font);
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 24px;
+            letter-spacing: 0.5px;
+            color: var(--md-sys-color-on-surface-variant);
             max-width: 600px;
-            line-height: 1.5;
+            margin: 0 auto;
         }
 
-        .cta-section {
+        /* ============================================
+           MD3 BUTTONS
+           ============================================ */
+        .md-button-group {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             margin-bottom: 64px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
-        .btn {
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
+        .md-button {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
+            height: 40px;
+            padding: 0 24px;
+            border: none;
+            border-radius: var(--md-sys-shape-corner-full);
+            font-family: var(--md-sys-typescale-label-large-font);
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            letter-spacing: 0.1px;
+            cursor: pointer;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
+                        background var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
         }
 
-        .btn-primary {
-            background: var(--accent);
-            color: white;
+        .md-button--filled {
+            background: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            box-shadow: none;
         }
 
-        .btn-primary:hover {
-            background: var(--accent-hover);
+        .md-button--filled:hover {
+            box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(0deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08)), var(--md-sys-color-primary);
         }
 
-        .btn-secondary {
-            background: var(--surface);
-            color: var(--text-primary);
-            border: 1px solid var(--divider);
+        .md-button--filled:active {
+            box-shadow: none;
         }
 
-        .btn-secondary:hover {
-            background: var(--divider);
+        .md-button--outlined {
+            background: transparent;
+            color: var(--md-sys-color-primary);
+            border: 1px solid var(--md-sys-color-outline);
         }
 
-        .features-grid {
+        .md-button--outlined:hover {
+            background: rgba(var(--md-sys-color-primary-rgb, 103, 80, 164), 0.08);
+        }
+
+        [data-theme="dark"] .md-button--outlined:hover {
+            background: rgba(208, 188, 255, 0.08);
+        }
+
+        .md-button__icon {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        /* ============================================
+           MD3 FEATURE CARDS (Elevated Surface)
+           ============================================ */
+        .md-feature-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 48px;
+            gap: 16px;
             width: 100%;
-            max-width: 900px;
+            max-width: 960px;
         }
 
-        .feature-item {
+        .md-feature-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
+            padding: 24px;
+            border-radius: var(--md-sys-shape-corner-large);
+            background: var(--md-sys-elevation-surface-1);
+            transition: background var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-standard),
+                        transform var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
         }
 
-        .feature-icon {
+        .md-feature-card:hover {
+            background: var(--md-sys-elevation-surface-2);
+            transform: translateY(-2px);
+        }
+
+        .md-feature-card__icon-container {
             width: 48px;
             height: 48px;
-            margin: 0 auto 16px;
-            background: var(--surface);
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            color: var(--accent);
+            border-radius: var(--md-sys-shape-corner-medium);
+            background: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+            margin-bottom: 16px;
         }
 
-        .feature-title {
+        .md-feature-card__icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .md-feature-card__title {
+            font-family: var(--md-sys-typescale-title-large-font);
             font-size: 16px;
             font-weight: 500;
-            color: var(--text-primary);
+            line-height: 24px;
+            letter-spacing: 0.15px;
+            color: var(--md-sys-color-on-surface);
             margin-bottom: 8px;
         }
 
-        .feature-description {
+        .md-feature-card__description {
+            font-family: var(--md-sys-typescale-body-large-font);
             font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.5;
+            font-weight: 400;
+            line-height: 20px;
+            letter-spacing: 0.25px;
+            color: var(--md-sys-color-on-surface-variant);
         }
 
+        /* ============================================
+           MD3 RESPONSIVE
+           ============================================ */
         @media (max-width: 768px) {
-            .nav {
-                padding: 0 16px;
-            }
-
-            .nav-links {
+            .md-top-app-bar__nav-links {
                 display: none;
             }
 
-            .hero-title {
+            .md-hero__title {
                 font-size: 36px;
+                line-height: 44px;
             }
 
-            .hero-subtitle {
-                font-size: 18px;
-            }
-
-            .cta-section {
+            .md-button-group {
                 flex-direction: column;
                 width: 100%;
                 max-width: 300px;
             }
 
-            .btn {
+            .md-button {
                 width: 100%;
-                justify-content: center;
             }
 
-            .features-grid {
+            .md-feature-grid {
                 grid-template-columns: 1fr;
-                gap: 32px;
             }
         }
     </style>
 </head>
 <body>
-    <nav class="nav">
-        <div class="nav-left">
-            <div class="logo">Remora</div>
-            <div class="nav-links">
-                <a href="#" class="nav-link">Features</a>
-                <a href="#" class="nav-link">Documentation</a>
-                <a href="#" class="nav-link">Download</a>
-            </div>
+    <!-- MD3 Top App Bar -->
+    <header class="md-top-app-bar">
+        <div class="md-top-app-bar__leading">
+            <span class="md-top-app-bar__logo">Remora</span>
+            <nav class="md-top-app-bar__nav-links">
+                <a href="#features" class="md-nav-link">Features</a>
+                <a href="https://github.com/rajumark/Remora" class="md-nav-link">GitHub</a>
+            </nav>
         </div>
-        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
-            <span id="theme-icon">🌙</span>
-            <span id="theme-text">Dark</span>
+        <button class="md-icon-button" onclick="toggleTheme()" aria-label="Toggle theme">
+            <svg class="md-icon-button__icon" viewBox="0 0 24 24" id="theme-icon">
+                <!-- Default: Moon icon -->
+                <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+            </svg>
         </button>
-    </nav>
+    </header>
 
-    <main class="main-content">
-        <div class="hero">
-            <h1 class="hero-title">Android Development Bridge</h1>
-            <p class="hero-subtitle">
-                Advanced development tool for Android developers who need efficient device management, 
+    <!-- MD3 Main Content -->
+    <main class="md-main-content">
+        <!-- MD3 Hero Section -->
+        <section class="md-hero">
+            <h1 class="md-hero__title">Android Development Bridge</h1>
+            <p class="md-hero__subtitle">
+                Advanced development tool for Android developers who need efficient device management,
                 debugging capabilities, and seamless integration with modern workflows.
             </p>
+        </section>
+
+        <!-- MD3 Button Group -->
+        <div class="md-button-group">
+            <a href="https://github.com/rajumark/Remora/releases" class="md-button md-button--filled">
+                <svg class="md-button__icon" viewBox="0 0 24 24">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                Download
+            </a>
+            <a href="https://github.com/rajumark/Remora" class="md-button md-button--outlined">
+                View on GitHub
+            </a>
         </div>
 
-        <div class="cta-section">
-            <button class="btn btn-primary">
-                Get Started
-                <span>→</span>
-            </button>
-            <button class="btn btn-secondary">
-                View Documentation
-            </button>
-        </div>
-
-        <div class="features-grid">
-            <div class="feature-item">
-                <div class="feature-icon">📱</div>
-                <h3 class="feature-title">Device Management</h3>
-                <p class="feature-description">
+        <!-- MD3 Feature Grid -->
+        <div class="md-feature-grid" id="features">
+            <article class="md-feature-card">
+                <div class="md-feature-card__icon-container">
+                    <svg class="md-feature-card__icon" viewBox="0 0 24 24">
+                        <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/>
+                    </svg>
+                </div>
+                <h3 class="md-feature-card__title">Device Management</h3>
+                <p class="md-feature-card__description">
                     Monitor and control connected Android devices with real-time status updates and advanced debugging capabilities.
                 </p>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon">⚡</div>
-                <h3 class="feature-title">Developer Tools</h3>
-                <p class="feature-description">
+            </article>
+
+            <article class="md-feature-card">
+                <div class="md-feature-card__icon-container">
+                    <svg class="md-feature-card__icon" viewBox="0 0 24 24">
+                        <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V6h16v12zM9 8h2v6H9zm4 0h2v6h-2z"/>
+                    </svg>
+                </div>
+                <h3 class="md-feature-card__title">Developer Tools</h3>
+                <p class="md-feature-card__description">
                     Integrated terminal, file management, and debugging tools optimized for Android development workflows.
                 </p>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon">🌐</div>
-                <h3 class="feature-title">Cross-Platform</h3>
-                <p class="feature-description">
+            </article>
+
+            <article class="md-feature-card">
+                <div class="md-feature-card__icon-container">
+                    <svg class="md-feature-card__icon" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                    </svg>
+                </div>
+                <h3 class="md-feature-card__title">Cross-Platform</h3>
+                <p class="md-feature-card__description">
                     Built with modern multiplatform technology to provide consistent experience across all major operating systems.
                 </p>
-            </div>
+            </article>
         </div>
     </main>
 
     <script>
         const html = document.documentElement;
         const themeIcon = document.getElementById('theme-icon');
-        const themeText = document.getElementById('theme-text');
-        
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        html.setAttribute('data-theme', currentTheme);
-        updateThemeUI(currentTheme);
-        
-        if (!localStorage.getItem('theme')) {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const autoTheme = prefersDark ? 'dark' : 'light';
-            html.setAttribute('data-theme', autoTheme);
-            updateThemeUI(autoTheme);
+
+        // Sun icon path
+        const sunIcon = '<path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>';
+        // Moon icon path
+        const moonIcon = '<path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>';
+
+        function updateThemeIcon(theme) {
+            themeIcon.innerHTML = theme === 'dark' ? sunIcon : moonIcon;
         }
-        
+
+        // Check for saved theme preference or default to light
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const currentTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+
+        html.setAttribute('data-theme', currentTheme);
+        updateThemeIcon(currentTheme);
+
+        // Listen for system theme changes
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
             if (!localStorage.getItem('theme')) {
-                const autoTheme = e.matches ? 'dark' : 'light';
-                html.setAttribute('data-theme', autoTheme);
-                updateThemeUI(autoTheme);
+                const newTheme = e.matches ? 'dark' : 'light';
+                html.setAttribute('data-theme', newTheme);
+                updateThemeIcon(newTheme);
             }
         });
-        
+
         function toggleTheme() {
             const currentTheme = html.getAttribute('data-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            
+
             html.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
-            updateThemeUI(newTheme);
-        }
-        
-        function updateThemeUI(theme) {
-            if (theme === 'dark') {
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Light';
-            } else {
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Dark';
-            }
+            updateThemeIcon(newTheme);
         }
     </script>
 </body>

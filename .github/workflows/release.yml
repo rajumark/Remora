@@ -7,34 +7,37 @@ on:
       - master
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
-  # build-windows:
-  #   name: Build Windows MSI
-  #   if: contains(github.event.head_commit.message, '#go')
-  #   runs-on: windows-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+  build-windows:
+    name: Build Windows MSI
+    if: contains(github.event.head_commit.message, '#go')
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Set up JDK
-  #       uses: actions/setup-java@v4
-  #       with:
-  #         distribution: 'temurin'
-  #         java-version: '17'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-  #     - name: Grant execute permission for gradlew
-  #       run: chmod +x gradlew
-  #       shell: bash
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        shell: bash
 
-  #     - name: Build Windows MSI
-  #       run: ./gradlew composeApp:packageMsi
+      - name: Build Windows MSI
+        run: ./gradlew composeApp:packageMsi
 
-  #     - name: Upload Windows MSI
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: Remora-Windows-MSI
-  #         path: composeApp/build/compose/binaries/main/msi/*.msi
-  #         retention-days: 30
+      - name: Upload Windows MSI
+        uses: actions/upload-artifact@v4
+        with:
+          name: Remora-Windows-MSI
+          path: composeApp/build/compose/binaries/main/msi/*.msi
+          retention-days: 30
 
   build-linux:
     name: Build Linux AppImage
@@ -65,7 +68,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Remora-Linux-AppImage
-          path: composeApp/build/compose/binaries/main/appimage/*.AppImage
+          path: composeApp/build/compose/binaries/main/app/*.AppImage
           retention-days: 30
 
   # build-mac-intel:
@@ -124,7 +127,7 @@ jobs:
 
   create-release:
     name: Create Release
-    needs: [build-linux, build-mac-apple-silicon]
+    needs: [build-windows, build-linux, build-mac-apple-silicon]
     if: contains(github.event.head_commit.message, '#go')
     runs-on: ubuntu-latest
     steps:
@@ -159,6 +162,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
+            ./artifacts/Remora-Windows-MSI/*.msi
             ./artifacts/Remora-Linux-AppImage/*.AppImage
             ./artifacts/Remora-Mac-AppleSilicon-DMG/*.dmg
         env:
