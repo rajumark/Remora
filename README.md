@@ -24,4 +24,15 @@ in your IDE’s toolbar or run it directly from the terminal:
 
 ---
 
+### macOS Installation Note
+
+After installing Remora.app, you may need to remove the quarantine attribute to open it:
+
+```shell
+sudo -s
+xattr -rd com.apple.quarantine /Applications/Remora.app
+```
+
+---
+
 Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
