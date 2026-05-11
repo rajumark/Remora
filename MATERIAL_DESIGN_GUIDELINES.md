@@ -5,7 +5,7 @@
 ### Use Only Standard Material Design Components
 - **NO custom UI components** - Always use built-in Material Design components
 - **NO custom colors** - Use default MaterialTheme colors
-- **NO custom styling** - Use default Material Design styling
+- **NO custom styling** - Use default Material Design styling 
 
 ### Approved Material Design Components
 
