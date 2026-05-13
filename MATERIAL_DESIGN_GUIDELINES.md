@@ -3,38 +3,45 @@
 ## Core Principles
 
 ### Use Only Standard Material Design Components
+
 - **NO custom UI components** - Always use built-in Material Design components
 - **NO custom colors** - Use default MaterialTheme colors
-- **NO custom styling** - Use default Material Design styling 
+- **NO custom styling** - Use default Material Design styling
 
 ### Approved Material Design Components
 
 #### Navigation
+
 - `PermanentNavigationDrawer` - For desktop navigation
 - `NavigationDrawerItem` - For navigation menu items
 - `BottomNavigationBar` - For mobile bottom navigation
 
 #### Layout
+
 - `Row`, `Column`, `Box` - For basic layout
 - `LazyColumn`, `LazyRow` - For scrolling lists
 - `Card` - Only default styling, no custom colors
 
 #### Input
+
 - `Button`, `TextButton`, `OutlinedButton` - Use default styling
 - `TextField` - Use default styling only
 - `Checkbox`, `RadioButton`, `Switch` - Default styling
 
 #### Display
+
 - `Text` - Use MaterialTheme.typography only
 - `Icon` - Use default icons only
 - `Image` - Default loading behavior
 
 #### Containers
+
 - `Surface` - Default colors only
 - `Scaffold` - For screen structure
 - `TopAppBar` - Default styling
 
 ### Typography
+
 - Use only `MaterialTheme.typography` values:
   - `displayLarge`, `displayMedium`, `displaySmall`
   - `headlineLarge`, `headlineMedium`, `headlineSmall`
@@ -43,6 +50,7 @@
   - `labelLarge`, `labelMedium`, `labelSmall`
 
 ### Colors
+
 - **NEVER** specify custom colors
 - Use only `MaterialTheme.colorScheme`:
   - `primary`, `onPrimary`
@@ -52,12 +60,14 @@
   - `error`, `onError`
 
 ### Spacing
+
 - Use Material Design spacing values:
 - `4.dp`, `8.dp`, `16.dp`, `24.dp`, `32.dp`
 
 ### Examples of What NOT to Do
 
 ❌ **WRONG:**
+
 ```kotlin
 Card(
     colors = CardDefaults.cardColors(
@@ -73,6 +83,7 @@ Text(
 ```
 
 ✅ **CORRECT:**
+
 ```kotlin
 Card { /* content */ } // Default styling
 
@@ -83,6 +94,7 @@ Text(
 ```
 
 ### Project-Specific Rules
+
 1. Always prefer built-in Material Design components
 2. Never create custom composables for standard UI elements
 3. Use default MaterialTheme values for colors, typography, and shapes
