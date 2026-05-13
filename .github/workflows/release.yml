@@ -41,7 +41,7 @@ jobs:
           retention-days: 30
 
   build-linux:
-    name: Build Linux AppImage
+    name: Build Linux portable bundle
     if: contains(github.event.head_commit.message, '#go')
     runs-on: ubuntu-latest
     steps:
@@ -54,29 +54,31 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y file fuse libfuse2
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build Linux AppImage
+      # Compose maps AppImage to jpackage --type app-image: a self-contained app directory, not a *.AppImage file.
+      - name: Build Linux application image
         run: ./gradlew composeApp:packageAppImage
 
-      - name: Collect Linux AppImage
+      - name: Collect Linux bundle
         run: |
+          set -euo pipefail
+          APP_ROOT="composeApp/build/compose/binaries/main/app"
+          test -d "$APP_ROOT"
+          ls -la "$APP_ROOT"
           mkdir -p artifacts/linux
-          find composeApp/build/compose/binaries/main -type f -name '*.AppImage' -exec cp {} artifacts/linux/ \;
-          ls -la artifacts/linux
-          test -n "$(find artifacts/linux -type f -name '*.AppImage' -print -quit)"
+          version=$(grep -oE 'packageVersion = "[0-9]+\.[0-9]+\.[0-9]+"' composeApp/build.gradle.kts | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          out="artifacts/linux/Remora-${version}-linux-x64.tar.gz"
+          tar -C "$APP_ROOT" -czf "$out" .
+          test -s "$out"
+          ls -lh artifacts/linux
 
-      - name: Upload Linux AppImage
+      - name: Upload Linux bundle
         uses: actions/upload-artifact@v4
         with:
-          name: Remora-Linux-AppImage
-          path: artifacts/linux/*.AppImage
+          name: Remora-Linux
+          path: artifacts/linux/*.tar.gz
           if-no-files-found: error
           retention-days: 30
 
@@ -173,7 +175,7 @@ jobs:
           prerelease: false
           files: |
             ./artifacts/Remora-Windows-MSI/*.msi
-            ./artifacts/Remora-Linux-AppImage/*.AppImage
+            ./artifacts/Remora-Linux/*.tar.gz
             ./artifacts/Remora-Mac-AppleSilicon-DMG/*.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
