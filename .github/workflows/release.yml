@@ -37,6 +37,7 @@ jobs:
         with:
           name: Remora-Windows-MSI
           path: composeApp/build/compose/binaries/main/msi/*.msi
+          if-no-files-found: error
           retention-days: 30
 
   build-linux:
@@ -64,11 +65,19 @@ jobs:
       - name: Build Linux AppImage
         run: ./gradlew composeApp:packageAppImage
 
+      - name: Collect Linux AppImage
+        run: |
+          mkdir -p artifacts/linux
+          find composeApp/build/compose/binaries/main -type f -name '*.AppImage' -exec cp {} artifacts/linux/ \;
+          ls -la artifacts/linux
+          test -n "$(find artifacts/linux -type f -name '*.AppImage' -print -quit)"
+
       - name: Upload Linux AppImage
         uses: actions/upload-artifact@v4
         with:
           name: Remora-Linux-AppImage
-          path: composeApp/build/compose/binaries/main/app/*.AppImage
+          path: artifacts/linux/*.AppImage
+          if-no-files-found: error
           retention-days: 30
 
   # build-mac-intel:
@@ -123,6 +132,7 @@ jobs:
         with:
           name: Remora-Mac-AppleSilicon-DMG
           path: composeApp/build/compose/binaries/main/dmg/*.dmg
+          if-no-files-found: error
           retention-days: 30
 
   create-release:
